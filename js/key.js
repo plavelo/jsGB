@@ -45,7 +45,7 @@ KEY = {
       case 40: KEY._keys[1] |= 0x8; break;
       case 90: KEY._keys[0] |= 0x1; break;
       case 88: KEY._keys[0] |= 0x2; break;
-      case 32: KEY._keys[0] |= 0x5; break;
+      case 32: KEY._keys[0] |= 0x4; break;
       case 13: KEY._keys[0] |= 0x8; break;
     }
   }
