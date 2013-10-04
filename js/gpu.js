@@ -54,7 +54,6 @@ GPU = {
       }
     }
 
-    LOG.out('GPU', 'Initialising screen.');
     var c = document.getElementById('screen');
     if(c && c.getContext)
     {
@@ -106,7 +105,6 @@ GPU = {
     GPU._bgmapbase = 0x1800;
     GPU._wintilebase = 0x1800;
 
-    LOG.out('GPU', 'Reset.');
   },
 
   checkline: function() {

@@ -5,7 +5,6 @@ KEY = {
   reset: function() {
     KEY._keys = [0x0F,0x0F];
     KEY._colidx = 0;
-    LOG.out('KEY', 'Reset.');
   },
 
   rb: function() {

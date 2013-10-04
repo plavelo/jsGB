@@ -48,16 +48,12 @@ MMU = {
     MMU._mbc[1] = {rombank:0, rambank:0, ramon:0, mode:0};
     MMU._romoffs=0x4000;
     MMU._ramoffs=0;
-
-    LOG.out('MMU', 'Reset.');
   },
 
   load: function(file) {
     b=new BinFileReader(file);
     MMU._rom=b.readString(b.getFileSize(), 0);
     MMU._carttype = MMU._rom.charCodeAt(0x0147);
-
-    LOG.out('MMU', 'ROM loaded, '+MMU._rom.length+' bytes.');
   },
 
   rb: function(addr) {
@@ -71,7 +67,6 @@ MMU = {
 	  else if(Z80._r.pc == 0x0100)
 	  {
 	    MMU._inbios = 0;
-	    LOG.out('MMU', 'Leaving BIOS.');
 	  }
 	}
 	else

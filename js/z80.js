@@ -29,7 +29,6 @@ Z80 = {
     Z80._halt=0; Z80._stop=0;
     Z80._clock.m=0;
     Z80._r.ime=1;
-    LOG.out('Z80', 'Reset.');
   },
 
   exec: function() {
@@ -647,13 +646,11 @@ Z80 = {
       var i=MMU.rb(Z80._r.pc); Z80._r.pc++;
       Z80._r.pc &= 65535;
       if(Z80._cbmap[i]) Z80._cbmap[i]();
-      else console.log(i);
     },
 
     XX: function() {
       /*Undefined map entry*/
       var opc = Z80._r.pc-1;
-      LOG.out('Z80', 'Unimplemented instruction at $'+opc.toString(16)+', stopping.');
       Z80._stop=1;
     }
   },

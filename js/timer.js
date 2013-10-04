@@ -15,7 +15,6 @@ TIMER = {
     TIMER._clock.main = 0;
     TIMER._clock.sub = 0;
     TIMER._clock.div = 0;
-    LOG.out('TIMER', 'Reset.');
   },
 
   step: function() {
