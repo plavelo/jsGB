@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
  <head>
-  <script type="text/javascript" src="js/fileread.js"></script>
   <script type="text/javascript" src="js/gpu.js"></script>
   <script type="text/javascript" src="js/mmu.js"></script>
   <script type="text/javascript" src="js/key.js"></script>
   <script type="text/javascript" src="js/timer.js"></script>
   <script type="text/javascript" src="js/z80.js"></script>
   <style type="text/css">
+
 * { margin:0; padding: 0; }
 body { padding: 5px; background-color: black; color: white; font-family:Arial, Helvetica, sans-serif; font-size:0.82em; }
 ul.ops li { cursor:pointer; }
@@ -24,7 +24,10 @@ div.subcanv { width:160px; float:left; }
     <li id="op_reset">Reset</li>
     <li id="op_run">Run</li>
    </ul>
-  </div>
+  </div><br />
+<input type="file" id="files" name="files[]" />
+<br />
+<output id="list"></output>
   <script type="text/javascript">
 jsGB = {
   run_interval: 0,
@@ -82,7 +85,7 @@ jsGB = {
 		Z80._r.c  = 0x13;
 		Z80._r.e  = 0xD8;
 		MMU._inbios=0;
-		MMU.load("./tests/ttt.gb");
+		MMU.load();
   
 		document.getElementById('op_reset').onclick=jsGB.reset;
 		document.getElementById('op_run').onclick=jsGB.run;
@@ -111,5 +114,31 @@ jsGB = {
 	window.onkeydown = KEY.keydown;
 	window.onkeyup   = KEY.keyup;
 </script>
+
+<script type="text/javascript">
+  function handleFileSelect(evt) {
+    var files = evt.target.files;
+
+    var f = files[0];
+    var fileType = f.type || 'n/a';
+    var lastModifiedDate = f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a';
+    document.getElementById('list').innerHTML = '<strong>' + f.name + '</strong> (' + fileType +  ') - ' + f.size + ' bytes, last modified: ' + lastModifiedDate;
+
+    var reader = new FileReader();
+    reader.readAsArrayBuffer(f);
+
+    reader.onload = function(evt) {
+      if (evt.target.readyState == FileReader.DONE) {
+        var buffer = evt.target.result;
+        var dataView = new DataView(buffer);
+        MMU._rom = new Uint8Array (buffer);
+      }
+    }
+  }
+
+
+  document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+
 </body>
 </html>

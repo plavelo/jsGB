@@ -19,10 +19,7 @@ MMU = {
   ],
   _rom: '',
   _carttype: 0,
-  _mbc: [
-    {},
-    {rombank:0, rambank:0, ramon:0, mode:0}
-  ],
+  _mbc: [{rombank:0, rambank:0, ramon:0, mode:0}],
   _romoffs: 0x4000,
   _ramoffs: 0,
 
@@ -44,16 +41,13 @@ MMU = {
     MMU._if=0;
 
     MMU._carttype=0;
-    MMU._mbc[0] = {};
     MMU._mbc[1] = {rombank:0, rambank:0, ramon:0, mode:0};
     MMU._romoffs=0x4000;
     MMU._ramoffs=0;
   },
 
   load: function(file) {
-    b=new BinFileReader(file);
-    MMU._rom=b.readString(b.getFileSize(), 0);
-    MMU._carttype = MMU._rom.charCodeAt(0x0147);
+    MMU._carttype = MMU._rom[0x0147];
   },
 
   rb: function(addr) {
@@ -61,27 +55,20 @@ MMU = {
     {
       // ROM bank 0
       case 0x0000:
-        if(MMU._inbios)
-	{
-	  if(addr<0x0100) return MMU._bios[addr];
-	  else if(Z80._r.pc == 0x0100)
-	  {
-	    MMU._inbios = 0;
-	  }
-	}
-	else
-	{
-	  return MMU._rom.charCodeAt(addr);
-	}
+      if(MMU._inbios)
+	    if(addr<0x0100) return MMU._bios[addr];
+        else if(Z80._r.pc == 0x0100) MMU._inbios = 0;
+      else
+        return MMU._rom[addr];
 
       case 0x1000:
       case 0x2000:
       case 0x3000:
-        return MMU._rom.charCodeAt(addr);
+        return MMU._rom[addr];
 
       // ROM bank 1
       case 0x4000: case 0x5000: case 0x6000: case 0x7000:
-        return MMU._rom.charCodeAt(MMU._romoffs+(addr&0x3FFF));
+        return MMU._rom[MMU._romoffs+(addr&0x3FFF)];
 
       // VRAM
       case 0x8000: case 0x9000:
