@@ -1,6 +1,20 @@
 jsGB: A GameBoy emulator in JavaScript
 --------------------------------------
 
+Install
+1 - Download source files
+2 - Double-click in index.html to open jsGB on your default browser
+3 - Click on “choose file” button
+4 - Select your favorite Gameboy ROM
+5 - Press “Run”
+6 - Have fun!
+
+
+Imran’s Notes
+—————————————
+jsGB: A GameBoy emulator in JavaScript
+--------------------------------------
+
 jsGB is an interpretive emulator of the GameBoy, designed to be run from
 within a web browser. Yes, it's written in JavaScript.
 

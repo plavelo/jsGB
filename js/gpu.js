@@ -127,7 +127,7 @@ GPU = {
             GPU._linemode = 2;
           }
           GPU._curline++;
-	  GPU._curscan += 640;
+          GPU._curscan += 640;
           GPU._modeclocks=0;
         }
         break;
@@ -141,7 +141,7 @@ GPU = {
           if(GPU._curline > 153)
           {
             GPU._curline = 0;
-	    GPU._curscan = 0;
+            GPU._curscan = 0;
             GPU._linemode = 2;
           }
         }
@@ -177,12 +177,12 @@ GPU = {
 
               if(GPU._bgtilebase)
               {
-	        var tile = GPU._vram[mapbase+t];
-		if(tile<128) tile=256+tile;
+                var tile = GPU._vram[mapbase+t];
+                if(tile<128) tile=256+tile;
                 var tilerow = GPU._tilemap[tile][y];
                 do
                 {
-		  GPU._scanrow[160-x] = tilerow[x];
+                  GPU._scanrow[160-x] = tilerow[x];
                   GPU._scrn.data[linebase+3] = GPU._palette.bg[tilerow[x]];
                   x++;
                   if(x==8) { t=(t+1)&31; x=0; tile=GPU._vram[mapbase+t]; if(tile<128) tile=256+tile; tilerow = GPU._tilemap[tile][y]; }
@@ -194,13 +194,13 @@ GPU = {
                 var tilerow=GPU._tilemap[GPU._vram[mapbase+t]][y];
                 do
                 {
-		  GPU._scanrow[160-x] = tilerow[x];
+                  GPU._scanrow[160-x] = tilerow[x];
                   GPU._scrn.data[linebase+3] = GPU._palette.bg[tilerow[x]];
                   x++;
                   if(x==8) { t=(t+1)&31; x=0; tilerow=GPU._tilemap[GPU._vram[mapbase+t]][y]; }
                   linebase+=4;
                 } while(--w);
-	      }
+              }
             }
             if(GPU._objon)
             {
