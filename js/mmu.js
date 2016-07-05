@@ -64,9 +64,9 @@ MMU = {
             return MMU.bios[addr]
           } else if (Z80.r.pc == 0x0100) {
             MMU.inbios = 0
-          } else {
-            return MMU.rom[addr]
           }
+        } else {
+          return MMU.rom[addr]
         }
       case 0x1000:
       case 0x2000:
