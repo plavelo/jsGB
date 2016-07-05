@@ -11,25 +11,25 @@ jsGB = {
         Z80._map[MMU.rb(Z80._r.pc++)]()
         Z80._r.pc &= 65535
       }
-      if (Z80._r.ime && MMU._ie && MMU._if) {
+      if (Z80._r.ime && MMU.ie && MMU.if) {
         Z80._halt = 0
         Z80._r.ime = 0
-        var ifired = MMU._ie & MMU._if
+        var ifired = MMU.ie & MMU.if
 
         if (ifired & 1) {
-          MMU._if &= 0xFE
+          MMU.if &= 0xFE
           Z80._ops.RST40()
         } else if (ifired & 2) {
-          MMU._if &= 0xFD
+          MMU.if &= 0xFD
           Z80._ops.RST48()
         } else if (ifired & 4) {
-          MMU._if &= 0xFB
+          MMU.if &= 0xFB
           Z80._ops.RST50()
         } else if (ifired & 8) {
-          MMU._if &= 0xF7
+          MMU.if &= 0xF7
           Z80._ops.RST58()
         } else if (ifired & 16) {
-          MMU._if &= 0xEF
+          MMU.if &= 0xEF
           Z80._ops.RST60()
         } else {
           Z80._r.ime = 1
@@ -58,7 +58,7 @@ jsGB = {
     Z80._r.a  = 0x01
     Z80._r.c  = 0x13
     Z80._r.e  = 0xD8
-    MMU._inbios = 0
+    MMU.inbios = 0
     MMU.load()
 
     document.getElementById('op_reset').onclick = jsGB.reset
@@ -86,23 +86,23 @@ window.onkeydown = KEY.keydown
 window.onkeyup   = KEY.keyup
 
 function handleFileSelect(evt) {
-    var files = evt.target.files
+  var files = evt.target.files
 
-    var f = files[0]
-    var fileType = f.type || 'n/a'
-    var lastModifiedDate = f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a'
-    document.getElementById('list').innerHTML = '<strong>' + f.name + '</strong> (' + fileType +  ') - ' + f.size + ' bytes, last modified: ' + lastModifiedDate
+  var f = files[0]
+  var fileType = f.type || 'n/a'
+  var lastModifiedDate = f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a'
+  document.getElementById('list').innerHTML = '<strong>' + f.name + '</strong> (' + fileType +  ') - ' + f.size + ' bytes, last modified: ' + lastModifiedDate
 
-    var reader = new FileReader()
-    reader.readAsArrayBuffer(f)
+  var reader = new FileReader()
+  reader.readAsArrayBuffer(f)
 
-    reader.onload = function(evt) {
-        if (evt.target.readyState == FileReader.DONE) {
-            var buffer = evt.target.result
-            var dataView = new DataView(buffer)
-            MMU._rom = new Uint8Array (buffer)
-        }
+  reader.onload = function(evt) {
+    if (evt.target.readyState == FileReader.DONE) {
+      var buffer = evt.target.result
+      var dataView = new DataView(buffer)
+      MMU.rom = new Uint8Array (buffer)
     }
+  }
 }
 
 document.getElementById('files').addEventListener('change', handleFileSelect, false)
