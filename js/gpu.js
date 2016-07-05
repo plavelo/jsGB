@@ -29,41 +29,41 @@ GPU = {
   bgmapbase: 0x1800,
   wintilebase: 0x1800,
   reset: function() {
-    for (let i=0; i<8192; i++) {
+    for (var i=0; i<8192; i++) {
       GPU.vram[i] = 0
     }
-    for (let i=0; i<160; i++) {
+    for (i=0; i<160; i++) {
       GPU.oam[i] = 0
     }
-    for (let i=0; i<4; i++) {
+    for (i=0; i<4; i++) {
       GPU.palette.bg[i] = 255
       GPU.palette.obj0[i] = 255
       GPU.palette.obj1[i] = 255
     }
-    for (let i=0; i<512; i++) {
+    for (i=0; i<512; i++) {
       GPU.tilemap[i] = []
-      for (let j=0;j<8;j++) {
+      for (j=0; j<8; j++) {
         GPU.tilemap[i][j] = []
-        for (let k=0; k<8; k++) {
+        for (k=0; k<8; k++) {
           GPU.tilemap[i][j][k] = 0
         }
       }
     }
 
-    let c = document.getElementById('screen')
+    var c = document.getElementById('screen')
     if (c && c.getContext) {
       GPU.canvas = c.getContext('2d')
       if (!GPU.canvas) {
-        throw new Error('GPU: Canvas context could not be created.');
+        throw new Error('GPU: Canvas context could not be created.')
       } else {
         if (GPU.canvas.createImageData) {
-          GPU.scrn = GPU.canvas.createImageData(160,144);
+          GPU.scrn = GPU.canvas.createImageData(160,144)
         } else if (GPU.canvas.getImageData) {
-          GPU.scrn = GPU.canvas.getImageData(0,0,160,144);
+          GPU.scrn = GPU.canvas.getImageData(0,0,160,144)
         } else {
           GPU.scrn = {'width': 160, 'height': 144, 'data': new Array(160 * 144 * 4)}
         }
-        for (let i=0; i<GPU.scrn.data.length; i++) {
+        for (i=0; i<GPU.scrn.data.length; i++) {
           GPU.scrn.data[i] = 255
         }
         GPU.canvas.putImageData(GPU.scrn, 0, 0)
@@ -85,21 +85,22 @@ GPU = {
     GPU.winon = 0
 
     GPU.objsize = 0
-    for (let i=0; i<160; i++) {
+    for (i=0; i<160; i++) {
       GPU.scanrow[i] = 0
     }
 
-    for (let i=0; i<40; i++) {
+    for (i=0; i<40; i++) {
       GPU.objdata[i] = {'y': -16, 'x': -8, 'tile': 0, 'palette': 0, 'yflip': 0, 'xflip': 0, 'prio': 0, 'num': i}
     }
 
+    // Set to values expected by BIOS, to start
     GPU.bgtilebase = 0x0000
     GPU.bgmapbase = 0x1800
     GPU.wintilebase = 0x1800
   },
   checkline: function() {
     GPU.modeclocks += Z80.r.m
-    switch(GPU.linemode) {
+    switch (GPU.linemode) {
       // In hblank
       case 0:
         if (GPU.modeclocks >= 51) {
@@ -150,16 +151,15 @@ GPU = {
               var t = (GPU.xscrl >> 3) & 31
               var pixel
               var w = 160
-
               if (GPU.bgtilebase) {
                 var tile = GPU.vram[mapbase + t]
                 if (tile < 128) {
-                  tile=256+tile;
+                  tile = 256 + tile
                 }
                 var tilerow = GPU.tilemap[tile][y]
                 do {
                   GPU.scanrow[160 - x] = tilerow[x]
-                  GPU.scrn.data[linebase + 3] = GPU.palette.bg[tilerow[x]]
+                  GPU.scrn.data[linebase+3] = GPU.palette.bg[tilerow[x]]
                   x++
                   if (x == 8) {
                     t = (t + 1) & 31
@@ -167,21 +167,21 @@ GPU = {
                     tile = GPU.vram[mapbase + t]
                     if (tile < 128) {
                       tile = 256 + tile
-                      tilerow = GPU.tilemap[tile][y]
                     }
+                    tilerow = GPU.tilemap[tile][y]
                   }
                   linebase += 4
                 } while(--w)
               } else {
-                var tilerow = GPU.tilemap[GPU.vram[mapbase + t]][y]
+                var tilerow = GPU.tilemap[GPU.vram[mapbase+t]][y]
                 do {
-                  GPU.scanrow[160 - x] = tilerow[x]
-                  GPU.scrn.data[linebase + 3] = GPU.palette.bg[tilerow[x]]
+                  GPU.scanrow[160-x] = tilerow[x]
+                  GPU.scrn.data[linebase+3] = GPU.palette.bg[tilerow[x]]
                   x++
                   if (x == 8) {
                     t = (t + 1) & 31
                     x = 0
-                    tilerow = GPU.tilemap[GPU.vram[mapbase + t]][y]
+                    tilerow = GPU.tilemap[GPU.vram[mapbase+t]][y]
                   }
                   linebase += 4
                 } while(--w)
@@ -190,7 +190,7 @@ GPU = {
             if (GPU.objon) {
               var cnt = 0
               if (GPU.objsize) {
-                for (var i=0; i<40; i++) {
+                for(var i=0; i<40; i++) {
                 }
               } else {
                 var tilerow
@@ -205,7 +205,7 @@ GPU = {
                     if (obj.yflip) {
                       tilerow = GPU.tilemap[obj.tile][7 - (GPU.curline - obj.y)]
                     } else {
-                      tilerow = GPU.tilemap[obj.tile][GPU.curline-obj.y]
+                      tilerow = GPU.tilemap[obj.tile][GPU.curline - obj.y]
                     }
                     if (obj.palette) {
                       pal = GPU.palette.obj1
@@ -220,20 +220,20 @@ GPU = {
                             GPU.scrn.data[linebase + 3] = pal[tilerow[7 - x]]
                           }
                         }
-                        linebase += 4
+                        linebase+=4
                       }
                     } else {
                       for (x=0; x<8; x++) {
-                        if (obj.x + x >=0 && obj.x + x < 160) {
+                        if (obj.x+x >=0 && obj.x+x < 160) {
                           if (tilerow[x] && (obj.prio || !GPU.scanrow[x])) {
-                            GPU.scrn.data[linebase + 3] = pal[tilerow[x]]
+                            GPU.scrn.data[linebase+3] = pal[tilerow[x]]
                           }
                         }
-                        linebase += 4
+                        linebase+=4
                       }
                     }
                     cnt++
-                    if (cnt > 10) {
+                    if (cnt>10) {
                       break
                     }
                   }
@@ -268,30 +268,30 @@ GPU = {
     addr -= 0xFE00
     var obj = addr >> 2
     if (obj<40) {
-        switch (addr & 3) {
-          case 0: {
-            GPU.objdata[obj].y = val - 16
-            break
-          }
-          case 1: {
-            GPU.objdata[obj].x = val - 8
-            break
-          }
-          case 2:
-            if (GPU.objsize) {
-              GPU.objdata[obj].tile = (val & 0xFE)
-            } else {
-              GPU.objdata[obj].tile = val
-            }
-            break
-          case 3: {
-            GPU.objdata[obj].palette = (val & 0x10) ? 1 : 0
-            GPU.objdata[obj].xflip = (val & 0x20) ? 1 : 0
-            GPU.objdata[obj].yflip = (val & 0x40) ? 1 : 0
-            GPU.objdata[obj].prio = (val & 0x80) ? 1 : 0
-            break
-          }
+      switch (addr & 3) {
+        case 0: {
+          GPU.objdata[obj].y = val - 16
+          break
         }
+        case 1: {
+          GPU.objdata[obj].x = val - 8
+          break
+        }
+        case 2: {
+          if (GPU.objsize) {
+            GPU.objdata[obj].tile = (val & 0xFE)
+          } else {
+            GPU.objdata[obj].tile = val
+          }
+          break
+        }
+        case 3: {
+          GPU.objdata[obj].palette = (val & 0x10) ? 1 : 0
+          GPU.objdata[obj].xflip = (val & 0x20) ? 1 : 0
+          GPU.objdata[obj].yflip = (val & 0x40) ? 1 : 0
+          GPU.objdata[obj].prio = (val & 0x80) ? 1 : 0
+        }
+      }
     }
     GPU.objdatasorted = GPU.objdata
     GPU.objdatasorted.sort(function(a, b) {
@@ -307,12 +307,7 @@ GPU = {
     var gaddr = addr - 0xFF40
     switch(gaddr) {
       case 0:
-        return (GPU.lcdon ? 0x80 : 0) |
-               ((GPU.bgtilebase == 0x0000) ? 0x10 : 0) |
-               ((GPU.bgmapbase == 0x1C00) ? 0x08 : 0) |
-               (GPU.objsize ? 0x04 : 0) |
-               (GPU.objon ? 0x02 : 0) |
-               (GPU.bgon ? 0x01 : 0)
+        return (GPU.lcdon ? 0x80 : 0) |  ((GPU.bgtilebase == 0x0000) ? 0x10 : 0) | ((GPU.bgmapbase == 0x1C00) ? 0x08 : 0) | (GPU.objsize ? 0x04 : 0) | (GPU.objon ? 0x02 : 0) | (GPU.bgon ? 0x01 : 0)
       case 1:
         return (GPU.curline == GPU.raster ? 4 : 0) | GPU.linemode
       case 2:
@@ -412,7 +407,6 @@ GPU = {
               break
           }
         }
-        break
     }
   }
 }
