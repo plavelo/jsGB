@@ -8,7 +8,7 @@ jsGB = {
       if (Z80.halt) {
         Z80.r.m = 1
       } else {
-        Z80._map[MMU.rb(Z80.r.pc++)]()
+        Z80.map[MMU.rb(Z80.r.pc++)]()
         Z80.r.pc &= 65535
       }
       if (Z80.r.ime && MMU.ie && MMU.if) {
@@ -18,19 +18,19 @@ jsGB = {
 
         if (ifired & 1) {
           MMU.if &= 0xFE
-          Z80._ops.RST40()
+          Z80.ops.RST40()
         } else if (ifired & 2) {
           MMU.if &= 0xFD
-          Z80._ops.RST48()
+          Z80.ops.RST48()
         } else if (ifired & 4) {
           MMU.if &= 0xFB
-          Z80._ops.RST50()
+          Z80.ops.RST50()
         } else if (ifired & 8) {
           MMU.if &= 0xF7
-          Z80._ops.RST58()
+          Z80.ops.RST58()
         } else if (ifired & 16) {
           MMU.if &= 0xEF
-          Z80._ops.RST60()
+          Z80.ops.RST60()
         } else {
           Z80.r.ime = 1
         }
