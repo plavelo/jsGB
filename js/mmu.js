@@ -61,7 +61,7 @@ MMU = {
         if (MMU.inbios) {
           if (addr < 0x0100) {
             return MMU.bios[addr]
-          } else if (Z80._r.pc == 0x0100) {
+          } else if (Z80.r.pc == 0x0100) {
             MMU.inbios = 0
           } else {
             return MMU.rom[addr]

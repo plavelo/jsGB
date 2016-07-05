@@ -30,7 +30,7 @@ TIMER = {
   },
   inc: function() {
     var oldclk = TIMER.clock.main
-    TIMER.clock.sub += Z80._r.m;
+    TIMER.clock.sub += Z80.r.m;
     if (TIMER.clock.sub > 3) {
       TIMER.clock.main++
       TIMER.clock.sub -= 4

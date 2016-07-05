@@ -98,7 +98,7 @@ GPU = {
     GPU.wintilebase = 0x1800
   },
   checkline: function() {
-    GPU.modeclocks += Z80._r.m
+    GPU.modeclocks += Z80.r.m
     switch(GPU.linemode) {
       // In hblank
       case 0:
