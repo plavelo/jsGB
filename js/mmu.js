@@ -72,7 +72,7 @@ MMU = {
 
       // VRAM
       case 0x8000: case 0x9000:
-        return GPU._vram[addr&0x1FFF];
+        return GPU.vram[addr&0x1FFF];
 
       // External RAM
       case 0xA000: case 0xB000:
@@ -95,7 +95,7 @@ MMU = {
 
           // OAM
           case 0xE00:
-            return ((addr&0xFF)<0xA0) ? GPU._oam[addr&0xFF] : 0;
+            return ((addr&0xFF)<0xA0) ? GPU.oam[addr&0xFF] : 0;
 
           // Zeropage RAM, I/O, interrupts
           case 0xF00:
@@ -194,7 +194,7 @@ MMU = {
 
       // VRAM
       case 0x8000: case 0x9000:
-        GPU._vram[addr&0x1FFF] = val;
+        GPU.vram[addr&0x1FFF] = val;
         GPU.updatetile(addr&0x1FFF, val);
         break;
 
@@ -222,7 +222,7 @@ MMU = {
 
           // OAM
           case 0xE00:
-            if((addr&0xFF)<0xA0) GPU._oam[addr&0xFF] = val;
+            if((addr&0xFF)<0xA0) GPU.oam[addr&0xFF] = val;
               GPU.updateoam(addr,val);
             break;
 
