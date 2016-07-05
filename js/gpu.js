@@ -198,7 +198,7 @@ GPU = {
                 var pal
                 var pixel
                 var x
-                var linebase = GPU._curscan
+                var linebase = GPU.curscan
                 for (var i=0; i<40; i++) {
                   obj = GPU.objdatasorted[i]
                   if (obj.y <= GPU.curline && (obj.y + 8) > GPU.curline) {
@@ -245,17 +245,22 @@ GPU = {
         break
     }
   },
+  // Takes a value written to VRAM, and updates the
+  // internal tile data set
   updatetile: function(addr, val) {
     var saddr = addr
     if (addr & 1) {
       saddr--
       addr--
     }
+    // Work out which tile and row was updated
     var tile = (addr >> 4) & 511
     var y = (addr >> 1) & 7
     var sx
+    // Find bit index for this pixel
     for (var x=0; x<8; x++) {
       sx = 1 << (7 - x)
+      // Update tile set
       GPU.tilemap[tile][y][x] = ((GPU.vram[saddr] & sx) ? 1 : 0) | ((GPU.vram[saddr + 1] & sx) ? 2 : 0)
     }
   },

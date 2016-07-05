@@ -54,6 +54,7 @@ MMU = {
   load: function(file) {
     MMU.carttype = MMU.rom[0x0147]
   },
+  // Read a byte from memory
   rb: function(addr) {
     switch(addr & 0xF000) {
       // ROM bank 0
@@ -125,6 +126,7 @@ MMU = {
         }
     }
   },
+  // Read a 16-bit word
   rw: function(addr) {
     return MMU.rb(addr) + (MMU.rb(addr + 1) << 8)
   },
@@ -178,6 +180,7 @@ MMU = {
       // VRAM
       case 0x8000: case 0x9000:
         GPU.vram[addr & 0x1FFF] = val
+        // Get the "base address" for this tile row
         GPU.updatetile(addr & 0x1FFF, val)
         break
       // External RAM
