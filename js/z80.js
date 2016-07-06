@@ -7,18 +7,17 @@
 
 Z80 = {
   r: {
-    a:0, b:0, c:0, d:0, e:0, h:0, l:0, f:0,
-    sp:0, pc:0, i:0, r:0,
-    m:0,
-    ime:0
+    a: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, f: 0,
+    sp: 0, pc: 0, i: 0, r: 0,
+    m: 0,
+    ime: 0
   },
 
   rsv: {
-    a:0, b:0, c:0, d:0, e:0, h:0, l:0, f:0
+    a: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, f: 0
   },
 
-  clock: {m:0},
-
+  clock: {m: 0},
   halt: 0,
   stop: 0,
   reset: function() {
@@ -631,193 +630,192 @@ Z80 = {
       Z80.rsv.e = Z80.r.e; Z80.rsv.f = Z80.r.f
       Z80.rsv.h = Z80.r.h; Z80.rsv.l = Z80.r.l
     },
-
     rrs: function() {
       Z80.r.a = Z80.rsv.a; Z80.r.b = Z80.rsv.b
       Z80.r.c = Z80.rsv.c; Z80.r.d = Z80.rsv.d
       Z80.r.e = Z80.rsv.e; Z80.r.f = Z80.rsv.f
       Z80.r.h = Z80.rsv.h; Z80.r.l = Z80.rsv.l
     },
-
     MAPcb: function() {
-      var i=MMU.rb(Z80.r.pc); Z80.r.pc++
+      var i = MMU.rb(Z80.r.pc)
+      Z80.r.pc++
       Z80.r.pc &= 65535
-      if(Z80.cbmap[i]) Z80.cbmap[i]()
+      if (Z80.cbmap[i]) {
+        Z80.cbmap[i]()
+      }
     },
-
     XX: function() {
-      /*Undefined map entry*/
-      var opc = Z80.r.pc-1
-      Z80.stop=1
+      // Undefined map entry
+      var opc = Z80.r.pc - 1
+      Z80.stop = 1
     }
   },
-
-  _map: [],
-  _cbmap: []
+  map: [],
+  cbmap: []
 }
 
 Z80.map = [
   // 00
-  Z80.ops.NOP,		Z80.ops.LDBCnn,	Z80.ops.LDBCmA,	Z80.ops.INCBC,
-  Z80.ops.INCr_b,	Z80.ops.DECr_b,	Z80.ops.LDrn_b,	Z80.ops.RLCA,
-  Z80.ops.LDmmSP,	Z80.ops.ADDHLBC,	Z80.ops.LDABCm,	Z80.ops.DECBC,
-  Z80.ops.INCr_c,	Z80.ops.DECr_c,	Z80.ops.LDrn_c,	Z80.ops.RRCA,
+  Z80.ops.NOP,  Z80.ops.LDBCnn, Z80.ops.LDBCmA, Z80.ops.INCBC,
+  Z80.ops.INCr_b, Z80.ops.DECr_b, Z80.ops.LDrn_b, Z80.ops.RLCA,
+  Z80.ops.LDmmSP, Z80.ops.ADDHLBC, Z80.ops.LDABCm, Z80.ops.DECBC,
+  Z80.ops.INCr_c, Z80.ops.DECr_c, Z80.ops.LDrn_c, Z80.ops.RRCA,
   // 10
-  Z80.ops.DJNZn,	Z80.ops.LDDEnn,	Z80.ops.LDDEmA,	Z80.ops.INCDE,
-  Z80.ops.INCr_d,	Z80.ops.DECr_d,	Z80.ops.LDrn_d,	Z80.ops.RLA,
-  Z80.ops.JRn,		Z80.ops.ADDHLDE,	Z80.ops.LDADEm,	Z80.ops.DECDE,
-  Z80.ops.INCr_e,	Z80.ops.DECr_e,	Z80.ops.LDrn_e,	Z80.ops.RRA,
+  Z80.ops.DJNZn, Z80.ops.LDDEnn, Z80.ops.LDDEmA, Z80.ops.INCDE,
+  Z80.ops.INCr_d, Z80.ops.DECr_d, Z80.ops.LDrn_d, Z80.ops.RLA,
+  Z80.ops.JRn,  Z80.ops.ADDHLDE, Z80.ops.LDADEm, Z80.ops.DECDE,
+  Z80.ops.INCr_e, Z80.ops.DECr_e, Z80.ops.LDrn_e, Z80.ops.RRA,
   // 20
-  Z80.ops.JRNZn,	Z80.ops.LDHLnn,	Z80.ops.LDHLIA,	Z80.ops.INCHL,
-  Z80.ops.INCr_h,	Z80.ops.DECr_h,	Z80.ops.LDrn_h,	Z80.ops.DAA,
-  Z80.ops.JRZn,	Z80.ops.ADDHLHL,	Z80.ops.LDAHLI,	Z80.ops.DECHL,
-  Z80.ops.INCr_l,	Z80.ops.DECr_l,	Z80.ops.LDrn_l,	Z80.ops.CPL,
+  Z80.ops.JRNZn, Z80.ops.LDHLnn, Z80.ops.LDHLIA, Z80.ops.INCHL,
+  Z80.ops.INCr_h, Z80.ops.DECr_h, Z80.ops.LDrn_h, Z80.ops.DAA,
+  Z80.ops.JRZn, Z80.ops.ADDHLHL, Z80.ops.LDAHLI, Z80.ops.DECHL,
+  Z80.ops.INCr_l, Z80.ops.DECr_l, Z80.ops.LDrn_l, Z80.ops.CPL,
   // 30
-  Z80.ops.JRNCn,	Z80.ops.LDSPnn,	Z80.ops.LDHLDA,	Z80.ops.INCSP,
-  Z80.ops.INCHLm,	Z80.ops.DECHLm,	Z80.ops.LDHLmn,	Z80.ops.SCF,
-  Z80.ops.JRCn,	Z80.ops.ADDHLSP,	Z80.ops.LDAHLD,	Z80.ops.DECSP,
-  Z80.ops.INCr_a,	Z80.ops.DECr_a,	Z80.ops.LDrn_a,	Z80.ops.CCF,
+  Z80.ops.JRNCn, Z80.ops.LDSPnn, Z80.ops.LDHLDA, Z80.ops.INCSP,
+  Z80.ops.INCHLm, Z80.ops.DECHLm, Z80.ops.LDHLmn, Z80.ops.SCF,
+  Z80.ops.JRCn, Z80.ops.ADDHLSP, Z80.ops.LDAHLD, Z80.ops.DECSP,
+  Z80.ops.INCr_a, Z80.ops.DECr_a, Z80.ops.LDrn_a, Z80.ops.CCF,
   // 40
-  Z80.ops.LDrr_bb,	Z80.ops.LDrr_bc,	Z80.ops.LDrr_bd,	Z80.ops.LDrr_be,
-  Z80.ops.LDrr_bh,	Z80.ops.LDrr_bl,	Z80.ops.LDrHLm_b,	Z80.ops.LDrr_ba,
-  Z80.ops.LDrr_cb,	Z80.ops.LDrr_cc,	Z80.ops.LDrr_cd,	Z80.ops.LDrr_ce,
-  Z80.ops.LDrr_ch,	Z80.ops.LDrr_cl,	Z80.ops.LDrHLm_c,	Z80.ops.LDrr_ca,
+  Z80.ops.LDrr_bb, Z80.ops.LDrr_bc, Z80.ops.LDrr_bd, Z80.ops.LDrr_be,
+  Z80.ops.LDrr_bh, Z80.ops.LDrr_bl, Z80.ops.LDrHLm_b, Z80.ops.LDrr_ba,
+  Z80.ops.LDrr_cb, Z80.ops.LDrr_cc, Z80.ops.LDrr_cd, Z80.ops.LDrr_ce,
+  Z80.ops.LDrr_ch, Z80.ops.LDrr_cl, Z80.ops.LDrHLm_c, Z80.ops.LDrr_ca,
   // 50
-  Z80.ops.LDrr_db,	Z80.ops.LDrr_dc,	Z80.ops.LDrr_dd,	Z80.ops.LDrr_de,
-  Z80.ops.LDrr_dh,	Z80.ops.LDrr_dl,	Z80.ops.LDrHLm_d,	Z80.ops.LDrr_da,
-  Z80.ops.LDrr_eb,	Z80.ops.LDrr_ec,	Z80.ops.LDrr_ed,	Z80.ops.LDrr_ee,
-  Z80.ops.LDrr_eh,	Z80.ops.LDrr_el,	Z80.ops.LDrHLm_e,	Z80.ops.LDrr_ea,
+  Z80.ops.LDrr_db, Z80.ops.LDrr_dc, Z80.ops.LDrr_dd, Z80.ops.LDrr_de,
+  Z80.ops.LDrr_dh, Z80.ops.LDrr_dl, Z80.ops.LDrHLm_d, Z80.ops.LDrr_da,
+  Z80.ops.LDrr_eb, Z80.ops.LDrr_ec, Z80.ops.LDrr_ed, Z80.ops.LDrr_ee,
+  Z80.ops.LDrr_eh, Z80.ops.LDrr_el, Z80.ops.LDrHLm_e, Z80.ops.LDrr_ea,
   // 60
-  Z80.ops.LDrr_hb,	Z80.ops.LDrr_hc,	Z80.ops.LDrr_hd,	Z80.ops.LDrr_he,
-  Z80.ops.LDrr_hh,	Z80.ops.LDrr_hl,	Z80.ops.LDrHLm_h,	Z80.ops.LDrr_ha,
-  Z80.ops.LDrr_lb,	Z80.ops.LDrr_lc,	Z80.ops.LDrr_ld,	Z80.ops.LDrr_le,
-  Z80.ops.LDrr_lh,	Z80.ops.LDrr_ll,	Z80.ops.LDrHLm_l,	Z80.ops.LDrr_la,
+  Z80.ops.LDrr_hb, Z80.ops.LDrr_hc, Z80.ops.LDrr_hd, Z80.ops.LDrr_he,
+  Z80.ops.LDrr_hh, Z80.ops.LDrr_hl, Z80.ops.LDrHLm_h, Z80.ops.LDrr_ha,
+  Z80.ops.LDrr_lb, Z80.ops.LDrr_lc, Z80.ops.LDrr_ld, Z80.ops.LDrr_le,
+  Z80.ops.LDrr_lh, Z80.ops.LDrr_ll, Z80.ops.LDrHLm_l, Z80.ops.LDrr_la,
   // 70
-  Z80.ops.LDHLmr_b,	Z80.ops.LDHLmr_c,	Z80.ops.LDHLmr_d,	Z80.ops.LDHLmr_e,
-  Z80.ops.LDHLmr_h,	Z80.ops.LDHLmr_l,	Z80.ops.HALT,		Z80.ops.LDHLmr_a,
-  Z80.ops.LDrr_ab,	Z80.ops.LDrr_ac,	Z80.ops.LDrr_ad,	Z80.ops.LDrr_ae,
-  Z80.ops.LDrr_ah,	Z80.ops.LDrr_al,	Z80.ops.LDrHLm_a,	Z80.ops.LDrr_aa,
+  Z80.ops.LDHLmr_b, Z80.ops.LDHLmr_c, Z80.ops.LDHLmr_d, Z80.ops.LDHLmr_e,
+  Z80.ops.LDHLmr_h, Z80.ops.LDHLmr_l, Z80.ops.HALT, Z80.ops.LDHLmr_a,
+  Z80.ops.LDrr_ab, Z80.ops.LDrr_ac, Z80.ops.LDrr_ad, Z80.ops.LDrr_ae,
+  Z80.ops.LDrr_ah, Z80.ops.LDrr_al, Z80.ops.LDrHLm_a, Z80.ops.LDrr_aa,
   // 80
-  Z80.ops.ADDr_b,	Z80.ops.ADDr_c,	Z80.ops.ADDr_d,	Z80.ops.ADDr_e,
-  Z80.ops.ADDr_h,	Z80.ops.ADDr_l,	Z80.ops.ADDHL,		Z80.ops.ADDr_a,
-  Z80.ops.ADCr_b,	Z80.ops.ADCr_c,	Z80.ops.ADCr_d,	Z80.ops.ADCr_e,
-  Z80.ops.ADCr_h,	Z80.ops.ADCr_l,	Z80.ops.ADCHL,		Z80.ops.ADCr_a,
+  Z80.ops.ADDr_b, Z80.ops.ADDr_c, Z80.ops.ADDr_d, Z80.ops.ADDr_e,
+  Z80.ops.ADDr_h, Z80.ops.ADDr_l, Z80.ops.ADDHL, Z80.ops.ADDr_a,
+  Z80.ops.ADCr_b, Z80.ops.ADCr_c, Z80.ops.ADCr_d, Z80.ops.ADCr_e,
+  Z80.ops.ADCr_h, Z80.ops.ADCr_l, Z80.ops.ADCHL, Z80.ops.ADCr_a,
   // 90
-  Z80.ops.SUBr_b,	Z80.ops.SUBr_c,	Z80.ops.SUBr_d,	Z80.ops.SUBr_e,
-  Z80.ops.SUBr_h,	Z80.ops.SUBr_l,	Z80.ops.SUBHL,		Z80.ops.SUBr_a,
-  Z80.ops.SBCr_b,	Z80.ops.SBCr_c,	Z80.ops.SBCr_d,	Z80.ops.SBCr_e,
-  Z80.ops.SBCr_h,	Z80.ops.SBCr_l,	Z80.ops.SBCHL,		Z80.ops.SBCr_a,
+  Z80.ops.SUBr_b, Z80.ops.SUBr_c, Z80.ops.SUBr_d, Z80.ops.SUBr_e,
+  Z80.ops.SUBr_h, Z80.ops.SUBr_l, Z80.ops.SUBHL, Z80.ops.SUBr_a,
+  Z80.ops.SBCr_b, Z80.ops.SBCr_c, Z80.ops.SBCr_d, Z80.ops.SBCr_e,
+  Z80.ops.SBCr_h, Z80.ops.SBCr_l, Z80.ops.SBCHL, Z80.ops.SBCr_a,
   // A0
-  Z80.ops.ANDr_b,	Z80.ops.ANDr_c,	Z80.ops.ANDr_d,	Z80.ops.ANDr_e,
-  Z80.ops.ANDr_h,	Z80.ops.ANDr_l,	Z80.ops.ANDHL,		Z80.ops.ANDr_a,
-  Z80.ops.XORr_b,	Z80.ops.XORr_c,	Z80.ops.XORr_d,	Z80.ops.XORr_e,
-  Z80.ops.XORr_h,	Z80.ops.XORr_l,	Z80.ops.XORHL,		Z80.ops.XORr_a,
+  Z80.ops.ANDr_b, Z80.ops.ANDr_c, Z80.ops.ANDr_d, Z80.ops.ANDr_e,
+  Z80.ops.ANDr_h, Z80.ops.ANDr_l, Z80.ops.ANDHL, Z80.ops.ANDr_a,
+  Z80.ops.XORr_b, Z80.ops.XORr_c, Z80.ops.XORr_d, Z80.ops.XORr_e,
+  Z80.ops.XORr_h, Z80.ops.XORr_l, Z80.ops.XORHL, Z80.ops.XORr_a,
   // B0
-  Z80.ops.ORr_b,	Z80.ops.ORr_c,		Z80.ops.ORr_d,		Z80.ops.ORr_e,
-  Z80.ops.ORr_h,	Z80.ops.ORr_l,		Z80.ops.ORHL,		Z80.ops.ORr_a,
-  Z80.ops.CPr_b,	Z80.ops.CPr_c,		Z80.ops.CPr_d,		Z80.ops.CPr_e,
-  Z80.ops.CPr_h,	Z80.ops.CPr_l,		Z80.ops.CPHL,		Z80.ops.CPr_a,
+  Z80.ops.ORr_b, Z80.ops.ORr_c, Z80.ops.ORr_d, Z80.ops.ORr_e,
+  Z80.ops.ORr_h, Z80.ops.ORr_l, Z80.ops.ORHL, Z80.ops.ORr_a,
+  Z80.ops.CPr_b, Z80.ops.CPr_c, Z80.ops.CPr_d, Z80.ops.CPr_e,
+  Z80.ops.CPr_h, Z80.ops.CPr_l, Z80.ops.CPHL, Z80.ops.CPr_a,
   // C0
-  Z80.ops.RETNZ,	Z80.ops.POPBC,		Z80.ops.JPNZnn,	Z80.ops.JPnn,
-  Z80.ops.CALLNZnn,	Z80.ops.PUSHBC,	Z80.ops.ADDn,		Z80.ops.RST00,
-  Z80.ops.RETZ,	Z80.ops.RET,		Z80.ops.JPZnn,		Z80.ops.MAPcb,
-  Z80.ops.CALLZnn,	Z80.ops.CALLnn,	Z80.ops.ADCn,		Z80.ops.RST08,
+  Z80.ops.RETNZ, Z80.ops.POPBC, Z80.ops.JPNZnn, Z80.ops.JPnn,
+  Z80.ops.CALLNZnn, Z80.ops.PUSHBC, Z80.ops.ADDn, Z80.ops.RST00,
+  Z80.ops.RETZ, Z80.ops.RET, Z80.ops.JPZnn, Z80.ops.MAPcb,
+  Z80.ops.CALLZnn, Z80.ops.CALLnn, Z80.ops.ADCn, Z80.ops.RST08,
   // D0
-  Z80.ops.RETNC,	Z80.ops.POPDE,		Z80.ops.JPNCnn,	Z80.ops.XX,
-  Z80.ops.CALLNCnn,	Z80.ops.PUSHDE,	Z80.ops.SUBn,		Z80.ops.RST10,
-  Z80.ops.RETC,	Z80.ops.RETI,		Z80.ops.JPCnn,		Z80.ops.XX,
-  Z80.ops.CALLCnn,	Z80.ops.XX,		Z80.ops.SBCn,		Z80.ops.RST18,
+  Z80.ops.RETNC, Z80.ops.POPDE, Z80.ops.JPNCnn, Z80.ops.XX,
+  Z80.ops.CALLNCnn, Z80.ops.PUSHDE, Z80.ops.SUBn, Z80.ops.RST10,
+  Z80.ops.RETC, Z80.ops.RETI, Z80.ops.JPCnn, Z80.ops.XX,
+  Z80.ops.CALLCnn, Z80.ops.XX, Z80.ops.SBCn, Z80.ops.RST18,
   // E0
-  Z80.ops.LDIOnA,	Z80.ops.POPHL,		Z80.ops.LDIOCA,	Z80.ops.XX,
-  Z80.ops.XX,		Z80.ops.PUSHHL,	Z80.ops.ANDn,		Z80.ops.RST20,
-  Z80.ops.ADDSPn,	Z80.ops.JPHL,		Z80.ops.LDmmA,		Z80.ops.XX,
-  Z80.ops.XX,		Z80.ops.XX,		Z80.ops.XORn,		Z80.ops.RST28,
+  Z80.ops.LDIOnA, Z80.ops.POPHL, Z80.ops.LDIOCA, Z80.ops.XX,
+  Z80.ops.XX, Z80.ops.PUSHHL, Z80.ops.ANDn, Z80.ops.RST20,
+  Z80.ops.ADDSPn, Z80.ops.JPHL, Z80.ops.LDmmA, Z80.ops.XX,
+  Z80.ops.XX, Z80.ops.XX, Z80.ops.XORn, Z80.ops.RST28,
   // F0
-  Z80.ops.LDAIOn,	Z80.ops.POPAF,		Z80.ops.LDAIOC,	Z80.ops.DI,
-  Z80.ops.XX,		Z80.ops.PUSHAF,	Z80.ops.ORn,		Z80.ops.RST30,
-  Z80.ops.LDHLSPn,	Z80.ops.XX,		Z80.ops.LDAmm,		Z80.ops.EI,
-  Z80.ops.XX,		Z80.ops.XX,		Z80.ops.CPn,		Z80.ops.RST38
+  Z80.ops.LDAIOn, Z80.ops.POPAF, Z80.ops.LDAIOC, Z80.ops.DI,
+  Z80.ops.XX, Z80.ops.PUSHAF, Z80.ops.ORn, Z80.ops.RST30,
+  Z80.ops.LDHLSPn, Z80.ops.XX, Z80.ops.LDAmm, Z80.ops.EI,
+  Z80.ops.XX, Z80.ops.XX, Z80.ops.CPn, Z80.ops.RST38
 ]
 
 Z80.cbmap = [
   // CB00
-  Z80.ops.RLCr_b,	Z80.ops.RLCr_c,	Z80.ops.RLCr_d,	Z80.ops.RLCr_e,
-  Z80.ops.RLCr_h,	Z80.ops.RLCr_l,	Z80.ops.RLCHL,		Z80.ops.RLCr_a,
-  Z80.ops.RRCr_b,	Z80.ops.RRCr_c,	Z80.ops.RRCr_d,	Z80.ops.RRCr_e,
-  Z80.ops.RRCr_h,	Z80.ops.RRCr_l,	Z80.ops.RRCHL,		Z80.ops.RRCr_a,
+  Z80.ops.RLCr_b, Z80.ops.RLCr_c, Z80.ops.RLCr_d, Z80.ops.RLCr_e,
+  Z80.ops.RLCr_h, Z80.ops.RLCr_l, Z80.ops.RLCHL, Z80.ops.RLCr_a,
+  Z80.ops.RRCr_b, Z80.ops.RRCr_c, Z80.ops.RRCr_d, Z80.ops.RRCr_e,
+  Z80.ops.RRCr_h, Z80.ops.RRCr_l, Z80.ops.RRCHL, Z80.ops.RRCr_a,
   // CB10
-  Z80.ops.RLr_b,	Z80.ops.RLr_c,		Z80.ops.RLr_d,		Z80.ops.RLr_e,
-  Z80.ops.RLr_h,	Z80.ops.RLr_l,		Z80.ops.RLHL,		Z80.ops.RLr_a,
-  Z80.ops.RRr_b,	Z80.ops.RRr_c,		Z80.ops.RRr_d,		Z80.ops.RRr_e,
-  Z80.ops.RRr_h,	Z80.ops.RRr_l,		Z80.ops.RRHL,		Z80.ops.RRr_a,
+  Z80.ops.RLr_b, Z80.ops.RLr_c, Z80.ops.RLr_d, Z80.ops.RLr_e,
+  Z80.ops.RLr_h, Z80.ops.RLr_l, Z80.ops.RLHL, Z80.ops.RLr_a,
+  Z80.ops.RRr_b, Z80.ops.RRr_c, Z80.ops.RRr_d, Z80.ops.RRr_e,
+  Z80.ops.RRr_h, Z80.ops.RRr_l, Z80.ops.RRHL, Z80.ops.RRr_a,
   // CB20
-  Z80.ops.SLAr_b,	Z80.ops.SLAr_c,	Z80.ops.SLAr_d,	Z80.ops.SLAr_e,
-  Z80.ops.SLAr_h,	Z80.ops.SLAr_l,	Z80.ops.XX,		Z80.ops.SLAr_a,
-  Z80.ops.SRAr_b,	Z80.ops.SRAr_c,	Z80.ops.SRAr_d,	Z80.ops.SRAr_e,
-  Z80.ops.SRAr_h,	Z80.ops.SRAr_l,	Z80.ops.XX,		Z80.ops.SRAr_a,
+  Z80.ops.SLAr_b, Z80.ops.SLAr_c, Z80.ops.SLAr_d, Z80.ops.SLAr_e,
+  Z80.ops.SLAr_h, Z80.ops.SLAr_l, Z80.ops.XX, Z80.ops.SLAr_a,
+  Z80.ops.SRAr_b, Z80.ops.SRAr_c, Z80.ops.SRAr_d, Z80.ops.SRAr_e,
+  Z80.ops.SRAr_h, Z80.ops.SRAr_l, Z80.ops.XX, Z80.ops.SRAr_a,
   // CB30
-  Z80.ops.SWAPr_b,	Z80.ops.SWAPr_c,	Z80.ops.SWAPr_d,	Z80.ops.SWAPr_e,
-  Z80.ops.SWAPr_h,	Z80.ops.SWAPr_l,	Z80.ops.XX,		Z80.ops.SWAPr_a,
-  Z80.ops.SRLr_b,	Z80.ops.SRLr_c,	Z80.ops.SRLr_d,	Z80.ops.SRLr_e,
-  Z80.ops.SRLr_h,	Z80.ops.SRLr_l,	Z80.ops.XX,		Z80.ops.SRLr_a,
+  Z80.ops.SWAPr_b, Z80.ops.SWAPr_c, Z80.ops.SWAPr_d, Z80.ops.SWAPr_e,
+  Z80.ops.SWAPr_h, Z80.ops.SWAPr_l, Z80.ops.XX, Z80.ops.SWAPr_a,
+  Z80.ops.SRLr_b, Z80.ops.SRLr_c, Z80.ops.SRLr_d, Z80.ops.SRLr_e,
+  Z80.ops.SRLr_h, Z80.ops.SRLr_l, Z80.ops.XX, Z80.ops.SRLr_a,
   // CB40
-  Z80.ops.BIT0b,	Z80.ops.BIT0c,		Z80.ops.BIT0d,		Z80.ops.BIT0e,
-  Z80.ops.BIT0h,	Z80.ops.BIT0l,		Z80.ops.BIT0m,		Z80.ops.BIT0a,
-  Z80.ops.BIT1b,	Z80.ops.BIT1c,		Z80.ops.BIT1d,		Z80.ops.BIT1e,
-  Z80.ops.BIT1h,	Z80.ops.BIT1l,		Z80.ops.BIT1m,		Z80.ops.BIT1a,
+  Z80.ops.BIT0b, Z80.ops.BIT0c, Z80.ops.BIT0d, Z80.ops.BIT0e,
+  Z80.ops.BIT0h, Z80.ops.BIT0l, Z80.ops.BIT0m, Z80.ops.BIT0a,
+  Z80.ops.BIT1b, Z80.ops.BIT1c, Z80.ops.BIT1d, Z80.ops.BIT1e,
+  Z80.ops.BIT1h, Z80.ops.BIT1l, Z80.ops.BIT1m, Z80.ops.BIT1a,
   // CB50
-  Z80.ops.BIT2b,	Z80.ops.BIT2c,		Z80.ops.BIT2d,		Z80.ops.BIT2e,
-  Z80.ops.BIT2h,	Z80.ops.BIT2l,		Z80.ops.BIT2m,		Z80.ops.BIT2a,
-  Z80.ops.BIT3b,	Z80.ops.BIT3c,		Z80.ops.BIT3d,		Z80.ops.BIT3e,
-  Z80.ops.BIT3h,	Z80.ops.BIT3l,		Z80.ops.BIT3m,		Z80.ops.BIT3a,
+  Z80.ops.BIT2b, Z80.ops.BIT2c, Z80.ops.BIT2d, Z80.ops.BIT2e,
+  Z80.ops.BIT2h, Z80.ops.BIT2l, Z80.ops.BIT2m, Z80.ops.BIT2a,
+  Z80.ops.BIT3b, Z80.ops.BIT3c, Z80.ops.BIT3d, Z80.ops.BIT3e,
+  Z80.ops.BIT3h, Z80.ops.BIT3l, Z80.ops.BIT3m, Z80.ops.BIT3a,
   // CB60
-  Z80.ops.BIT4b,	Z80.ops.BIT4c,		Z80.ops.BIT4d,		Z80.ops.BIT4e,
-  Z80.ops.BIT4h,	Z80.ops.BIT4l,		Z80.ops.BIT4m,		Z80.ops.BIT4a,
-  Z80.ops.BIT5b,	Z80.ops.BIT5c,		Z80.ops.BIT5d,		Z80.ops.BIT5e,
-  Z80.ops.BIT5h,	Z80.ops.BIT5l,		Z80.ops.BIT5m,		Z80.ops.BIT5a,
+  Z80.ops.BIT4b, Z80.ops.BIT4c, Z80.ops.BIT4d, Z80.ops.BIT4e,
+  Z80.ops.BIT4h, Z80.ops.BIT4l, Z80.ops.BIT4m, Z80.ops.BIT4a,
+  Z80.ops.BIT5b, Z80.ops.BIT5c, Z80.ops.BIT5d, Z80.ops.BIT5e,
+  Z80.ops.BIT5h, Z80.ops.BIT5l, Z80.ops.BIT5m, Z80.ops.BIT5a,
   // CB70
-  Z80.ops.BIT6b,	Z80.ops.BIT6c,		Z80.ops.BIT6d,		Z80.ops.BIT6e,
-  Z80.ops.BIT6h,	Z80.ops.BIT6l,		Z80.ops.BIT6m,		Z80.ops.BIT6a,
-  Z80.ops.BIT7b,	Z80.ops.BIT7c,		Z80.ops.BIT7d,		Z80.ops.BIT7e,
-  Z80.ops.BIT7h,	Z80.ops.BIT7l,		Z80.ops.BIT7m,		Z80.ops.BIT7a,
+  Z80.ops.BIT6b, Z80.ops.BIT6c, Z80.ops.BIT6d, Z80.ops.BIT6e,
+  Z80.ops.BIT6h, Z80.ops.BIT6l, Z80.ops.BIT6m, Z80.ops.BIT6a,
+  Z80.ops.BIT7b, Z80.ops.BIT7c, Z80.ops.BIT7d, Z80.ops.BIT7e,
+  Z80.ops.BIT7h, Z80.ops.BIT7l, Z80.ops.BIT7m, Z80.ops.BIT7a,
   // CB80
-  Z80.ops.RES0b,	Z80.ops.RES0c,		Z80.ops.RES0d,		Z80.ops.RES0e,
-  Z80.ops.RES0h,	Z80.ops.RES0l,		Z80.ops.RES0m,		Z80.ops.RES0a,
-  Z80.ops.RES1b,	Z80.ops.RES1c,		Z80.ops.RES1d,		Z80.ops.RES1e,
-  Z80.ops.RES1h,	Z80.ops.RES1l,		Z80.ops.RES1m,		Z80.ops.RES1a,
+  Z80.ops.RES0b, Z80.ops.RES0c, Z80.ops.RES0d, Z80.ops.RES0e,
+  Z80.ops.RES0h, Z80.ops.RES0l, Z80.ops.RES0m, Z80.ops.RES0a,
+  Z80.ops.RES1b, Z80.ops.RES1c, Z80.ops.RES1d, Z80.ops.RES1e,
+  Z80.ops.RES1h, Z80.ops.RES1l, Z80.ops.RES1m, Z80.ops.RES1a,
   // CB90
-  Z80.ops.RES2b,	Z80.ops.RES2c,		Z80.ops.RES2d,		Z80.ops.RES2e,
-  Z80.ops.RES2h,	Z80.ops.RES2l,		Z80.ops.RES2m,		Z80.ops.RES2a,
-  Z80.ops.RES3b,	Z80.ops.RES3c,		Z80.ops.RES3d,		Z80.ops.RES3e,
-  Z80.ops.RES3h,	Z80.ops.RES3l,		Z80.ops.RES3m,		Z80.ops.RES3a,
+  Z80.ops.RES2b, Z80.ops.RES2c, Z80.ops.RES2d, Z80.ops.RES2e,
+  Z80.ops.RES2h, Z80.ops.RES2l, Z80.ops.RES2m, Z80.ops.RES2a,
+  Z80.ops.RES3b, Z80.ops.RES3c, Z80.ops.RES3d, Z80.ops.RES3e,
+  Z80.ops.RES3h, Z80.ops.RES3l, Z80.ops.RES3m, Z80.ops.RES3a,
   // CBA0
-  Z80.ops.RES4b,	Z80.ops.RES4c,		Z80.ops.RES4d,		Z80.ops.RES4e,
-  Z80.ops.RES4h,	Z80.ops.RES4l,		Z80.ops.RES4m,		Z80.ops.RES4a,
-  Z80.ops.RES5b,	Z80.ops.RES5c,		Z80.ops.RES5d,		Z80.ops.RES5e,
-  Z80.ops.RES5h,	Z80.ops.RES5l,		Z80.ops.RES5m,		Z80.ops.RES5a,
+  Z80.ops.RES4b, Z80.ops.RES4c, Z80.ops.RES4d, Z80.ops.RES4e,
+  Z80.ops.RES4h, Z80.ops.RES4l, Z80.ops.RES4m, Z80.ops.RES4a,
+  Z80.ops.RES5b, Z80.ops.RES5c, Z80.ops.RES5d, Z80.ops.RES5e,
+  Z80.ops.RES5h, Z80.ops.RES5l, Z80.ops.RES5m, Z80.ops.RES5a,
   // CBB0
-  Z80.ops.RES6b,	Z80.ops.RES6c,		Z80.ops.RES6d,		Z80.ops.RES6e,
-  Z80.ops.RES6h,	Z80.ops.RES6l,		Z80.ops.RES6m,		Z80.ops.RES6a,
-  Z80.ops.RES7b,	Z80.ops.RES7c,		Z80.ops.RES7d,		Z80.ops.RES7e,
-  Z80.ops.RES7h,	Z80.ops.RES7l,		Z80.ops.RES7m,		Z80.ops.RES7a,
+  Z80.ops.RES6b, Z80.ops.RES6c, Z80.ops.RES6d, Z80.ops.RES6e,
+  Z80.ops.RES6h, Z80.ops.RES6l, Z80.ops.RES6m, Z80.ops.RES6a,
+  Z80.ops.RES7b, Z80.ops.RES7c, Z80.ops.RES7d, Z80.ops.RES7e,
+  Z80.ops.RES7h, Z80.ops.RES7l, Z80.ops.RES7m, Z80.ops.RES7a,
   // CBC0
-  Z80.ops.SET0b,	Z80.ops.SET0c,		Z80.ops.SET0d,		Z80.ops.SET0e,
-  Z80.ops.SET0h,	Z80.ops.SET0l,		Z80.ops.SET0m,		Z80.ops.SET0a,
-  Z80.ops.SET1b,	Z80.ops.SET1c,		Z80.ops.SET1d,		Z80.ops.SET1e,
-  Z80.ops.SET1h,	Z80.ops.SET1l,		Z80.ops.SET1m,		Z80.ops.SET1a,
+  Z80.ops.SET0b, Z80.ops.SET0c, Z80.ops.SET0d, Z80.ops.SET0e,
+  Z80.ops.SET0h, Z80.ops.SET0l, Z80.ops.SET0m, Z80.ops.SET0a,
+  Z80.ops.SET1b, Z80.ops.SET1c, Z80.ops.SET1d, Z80.ops.SET1e,
+  Z80.ops.SET1h, Z80.ops.SET1l, Z80.ops.SET1m, Z80.ops.SET1a,
   // CBD0
-  Z80.ops.SET2b,	Z80.ops.SET2c,		Z80.ops.SET2d,		Z80.ops.SET2e,
-  Z80.ops.SET2h,	Z80.ops.SET2l,		Z80.ops.SET2m,		Z80.ops.SET2a,
-  Z80.ops.SET3b,	Z80.ops.SET3c,		Z80.ops.SET3d,		Z80.ops.SET3e,
-  Z80.ops.SET3h,	Z80.ops.SET3l,		Z80.ops.SET3m,		Z80.ops.SET3a,
+  Z80.ops.SET2b, Z80.ops.SET2c, Z80.ops.SET2d, Z80.ops.SET2e,
+  Z80.ops.SET2h, Z80.ops.SET2l, Z80.ops.SET2m, Z80.ops.SET2a,
+  Z80.ops.SET3b, Z80.ops.SET3c, Z80.ops.SET3d, Z80.ops.SET3e,
+  Z80.ops.SET3h, Z80.ops.SET3l, Z80.ops.SET3m, Z80.ops.SET3a,
   // CBE0
-  Z80.ops.SET4b,	Z80.ops.SET4c,		Z80.ops.SET4d,		Z80.ops.SET4e,
-  Z80.ops.SET4h,	Z80.ops.SET4l,		Z80.ops.SET4m,		Z80.ops.SET4a,
-  Z80.ops.SET5b,	Z80.ops.SET5c,		Z80.ops.SET5d,		Z80.ops.SET5e,
-  Z80.ops.SET5h,	Z80.ops.SET5l,		Z80.ops.SET5m,		Z80.ops.SET5a,
+  Z80.ops.SET4b, Z80.ops.SET4c, Z80.ops.SET4d, Z80.ops.SET4e,
+  Z80.ops.SET4h, Z80.ops.SET4l, Z80.ops.SET4m, Z80.ops.SET4a,
+  Z80.ops.SET5b, Z80.ops.SET5c, Z80.ops.SET5d, Z80.ops.SET5e,
+  Z80.ops.SET5h, Z80.ops.SET5l, Z80.ops.SET5m, Z80.ops.SET5a,
   // CBF0
-  Z80.ops.SET6b,	Z80.ops.SET6c,		Z80.ops.SET6d,		Z80.ops.SET6e,
-  Z80.ops.SET6h,	Z80.ops.SET6l,		Z80.ops.SET6m,		Z80.ops.SET6a,
-  Z80.ops.SET7b,	Z80.ops.SET7c,		Z80.ops.SET7d,		Z80.ops.SET7e,
-  Z80.ops.SET7h,	Z80.ops.SET7l,		Z80.ops.SET7m,		Z80.ops.SET7a,
+  Z80.ops.SET6b, Z80.ops.SET6c, Z80.ops.SET6d, Z80.ops.SET6e,
+  Z80.ops.SET6h, Z80.ops.SET6l, Z80.ops.SET6m, Z80.ops.SET6a,
+  Z80.ops.SET7b, Z80.ops.SET7c, Z80.ops.SET7d, Z80.ops.SET7e,
+  Z80.ops.SET7h, Z80.ops.SET7l, Z80.ops.SET7m, Z80.ops.SET7a,
 ]

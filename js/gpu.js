@@ -102,7 +102,7 @@ GPU = {
     GPU.modeclocks += Z80.r.m
     switch (GPU.linemode) {
       // In hblank
-      case 0:
+      case 0: {
         if (GPU.modeclocks >= 51) {
           // End of hblank for last scanline; render screen
           if (GPU.curline == 143) {
@@ -117,8 +117,9 @@ GPU = {
           GPU.modeclocks = 0
         }
         break
+      }
       // In vblank
-      case 1:
+      case 1: {
         if (GPU.modeclocks >= 114) {
           GPU.modeclocks = 0
           GPU.curline++
@@ -129,15 +130,17 @@ GPU = {
           }
         }
         break
+      }
       // In OAM-read mode
-      case 2:
+      case 2: {
         if (GPU.modeclocks >= 20) {
           GPU.modeclocks = 0
           GPU.linemode = 3
         }
         break
+      }
       // In VRAM-read mode
-      case 3:
+      case 3: {
         // Render scanline at end of allotted time
         if (GPU.modeclocks >= 43) {
           GPU.modeclocks = 0
@@ -149,7 +152,6 @@ GPU = {
               var y = (GPU.curline + GPU.yscrl) & 7
               var x = GPU.xscrl & 7
               var t = (GPU.xscrl >> 3) & 31
-              var pixel
               var w = 160
               if (GPU.bgtilebase) {
                 var tile = GPU.vram[mapbase + t]
@@ -173,7 +175,7 @@ GPU = {
                   linebase += 4
                 } while(--w)
               } else {
-                var tilerow = GPU.tilemap[GPU.vram[mapbase+t]][y]
+                var tilerow = GPU.tilemap[GPU.vram[mapbase + t]][y]
                 do {
                   GPU.scanrow[160-x] = tilerow[x]
                   GPU.scrn.data[linebase+3] = GPU.palette.bg[tilerow[x]]
@@ -189,14 +191,10 @@ GPU = {
             }
             if (GPU.objon) {
               var cnt = 0
-              if (GPU.objsize) {
-                for(var i=0; i<40; i++) {
-                }
-              } else {
+              if (!GPU.objsize) {
                 var tilerow
                 var obj
                 var pal
-                var pixel
                 var x
                 var linebase = GPU.curscan
                 for (var i=0; i<40; i++) {
@@ -243,6 +241,7 @@ GPU = {
           }
         }
         break
+      }
     }
   },
   // Takes a value written to VRAM, and updates the

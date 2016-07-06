@@ -19,7 +19,7 @@ MMU = {
   ],
   rom: '',
   carttype: 0,
-  mbc: [{rombank:0, rambank:0, ramon:0, mode:0}],
+  mbc: [{rombank: 0, rambank: 0, ramon: 0, mode: 0}],
   romoffs: 0x4000,
   ramoffs: 0,
 
