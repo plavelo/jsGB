@@ -10,7 +10,7 @@ GPU = {
 
   scanline: 0,
   curscan: 0,
-  linemode: 0,
+  gpumode: 0,
   ticks: 0,
 
   yscrl: 0,
@@ -74,7 +74,7 @@ GPU = {
 
     GPU.scanline = 0
     GPU.curscan = 0
-    GPU.linemode = 2
+    GPU.gpumode = 2
     GPU.ticks = 0
     GPU.scrollY = 0
     GPU.scrollX = 0
@@ -102,17 +102,17 @@ GPU = {
   },
   checkline: function() {
     GPU.ticks += Z80.r.m
-    switch (GPU.linemode) {
+    switch (GPU.gpumode) {
       // In hblank
       case 0: {
         if (GPU.ticks >= 51) {
           // End of hblank for last scanline; render screen
           if (GPU.scanline == 143) {
-            GPU.linemode = 1
+            GPU.gpumode = 1
             GPU.canvas.putImageData(GPU.scrn, 0, 0)
             MMU.if |= 1
           } else {
-            GPU.linemode = 2
+            GPU.gpumode = 2
           }
           GPU.scanline++
           GPU.curscan += 640
@@ -128,7 +128,7 @@ GPU = {
           if (GPU.scanline > 153) {
             GPU.scanline = 0
             GPU.curscan = 0
-            GPU.linemode = 2
+            GPU.gpumode = 2
           }
         }
         break
@@ -137,7 +137,7 @@ GPU = {
       case 2: {
         if (GPU.ticks >= 20) {
           GPU.ticks = 0
-          GPU.linemode = 3
+          GPU.gpumode = 3
         }
         break
       }
@@ -146,7 +146,7 @@ GPU = {
         // Render scanline at end of allotted time
         if (GPU.ticks >= 43) {
           GPU.ticks = 0
-          GPU.linemode = 0
+          GPU.gpumode = 0
           if (!GPU.lcdon) {
             break
           }
@@ -311,7 +311,7 @@ GPU = {
       case 0:
         return (GPU.lcdon ? 0x80 : 0) |  ((GPU.bgtilebase == 0x0000) ? 0x10 : 0) | ((GPU.bgmapbase == 0x1C00) ? 0x08 : 0) | (GPU.objsize ? 0x04 : 0) | (GPU.objon ? 0x02 : 0) | (GPU.bgon ? 0x01 : 0)
       case 1:
-        return (GPU.scanline == GPU.raster ? 4 : 0) | GPU.linemode
+        return (GPU.scanline == GPU.raster ? 4 : 0) | GPU.gpumode
       case 2:
         return GPU.scrollY
       case 3:
