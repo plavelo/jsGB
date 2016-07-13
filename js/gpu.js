@@ -13,8 +13,8 @@ GPU = {
   gpumode: 0,
   ticks: 0,
 
-  yscrl: 0,
-  xscrl: 0,
+  scrollY: 0,
+  scrollX: 0,
   raster: 0,
   ints: 0,
 
@@ -28,7 +28,6 @@ GPU = {
   objsize: 0,
 
   bgtilebase: 0x0000,
-  bgmapbase: 0x1800,
   wintilebase: 0x1800,
   reset: function() {
     for (var i=0; i<8192; i++) {
@@ -97,7 +96,6 @@ GPU = {
 
     // Set to values expected by BIOS, to start
     GPU.bgtilebase = 0x0000
-    GPU.bgmapbase = 0x1800
     GPU.wintilebase = 0x1800
   },
   checkline: function() {
@@ -152,13 +150,13 @@ GPU = {
           }
           if (GPU.bgon) {
             var linebase = GPU.curscan
-            var mapbase = GPU.bgmapbase + ((((GPU.scanline + GPU.scrollY) & 255) >> 3) << 5)
+            var mapOffset = ((GPU.control & 0x08) ? 0x1C00 : 0x1800) + ((((GPU.scanline + GPU.scrollY) & 255) >> 3) << 5)
             var y = (GPU.scanline + GPU.scrollY) & 7
             var x = GPU.scrollX & 7
             var t = (GPU.scrollX >> 3) & 31
             var w = 160
             if (GPU.bgtilebase) {
-              var tile = GPU.vram[mapbase + t]
+              var tile = GPU.vram[mapOffset + t]
               if (tile < 128) {
                 tile = 256 + tile
               }
@@ -170,7 +168,7 @@ GPU = {
                 if (x == 8) {
                   t = (t + 1) & 31
                   x = 0
-                  tile = GPU.vram[mapbase + t]
+                  tile = GPU.vram[mapOffset + t]
                   if (tile < 128) {
                     tile = 256 + tile
                   }
@@ -179,7 +177,7 @@ GPU = {
                 linebase += 4
               } while(--w)
             } else {
-              var tilerow = GPU.tilemap[GPU.vram[mapbase + t]][y]
+              var tilerow = GPU.tilemap[GPU.vram[mapOffset + t]][y]
               do {
                 GPU.scanrow[160-x] = tilerow[x]
                 GPU.scrn.data[linebase+3] = GPU.palette.bg[tilerow[x]]
@@ -187,7 +185,7 @@ GPU = {
                 if (x == 8) {
                   t = (t + 1) & 31
                   x = 0
-                  tilerow = GPU.tilemap[GPU.vram[mapbase+t]][y]
+                  tilerow = GPU.tilemap[GPU.vram[mapOffset+t]][y]
                 }
                 linebase += 4
               } while(--w)
@@ -309,7 +307,7 @@ GPU = {
     var gaddr = addr - 0xFF40
     switch(gaddr) {
       case 0:
-        return (GPU.lcdon ? 0x80 : 0) |  ((GPU.bgtilebase == 0x0000) ? 0x10 : 0) | ((GPU.bgmapbase == 0x1C00) ? 0x08 : 0) | (GPU.objsize ? 0x04 : 0) | (GPU.objon ? 0x02 : 0) | (GPU.bgon ? 0x01 : 0)
+        return GPU.control
       case 1:
         return (GPU.scanline == GPU.raster ? 4 : 0) | GPU.gpumode
       case 2:
@@ -333,7 +331,6 @@ GPU = {
 
         GPU.lcdon = (val & 0x80) ? 1 : 0
         GPU.bgtilebase = (val & 0x10) ? 0x0000 : 0x0800
-        GPU.bgmapbase = (val & 0x08) ? 0x1C00 : 0x1800
         GPU.objsize = (val & 0x04) ? 1 : 0
         GPU.objon = (val & 0x02) ? 1 : 0
         GPU.bgon = (val & 0x01) ? 1 : 0
