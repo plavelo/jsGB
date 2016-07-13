@@ -3,12 +3,11 @@ GPU = {
   oam: [],
   reg: [],
   tilemap: [],
-  sprite: [],
+  spritemap: [],
   palette: {'bg':[], 'obj0':[], 'obj1':[]},
   scanrow: [],
 
   scanline: 0,
-  curscan: 0,
   gpumode: 0,
   ticks: 0,
 
@@ -61,7 +60,6 @@ GPU = {
     }
 
     GPU.scanline = 0
-    GPU.curscan = 0
     GPU.gpumode = 2
     GPU.ticks = 0
     GPU.scrollY = 0
@@ -73,7 +71,7 @@ GPU = {
     }
 
     for (var i=0; i<40; i++) {
-      GPU.sprite[i] = {'y': -16, 'x': -8, 'tile': 0, 'palette': 0, 'yflip': 0, 'xflip': 0, 'prio': 0, 'num': i}
+      GPU.spritemap[i] = {'y': -16, 'x': -8, 'tile': 0, 'palette': 0, 'yflip': 0, 'xflip': 0, 'prio': 0, 'num': i}
     }
   },
   checkline: function() {
@@ -91,7 +89,6 @@ GPU = {
             GPU.gpumode = 2
           }
           GPU.scanline++
-          GPU.curscan += 640
           GPU.ticks = 0
         }
         break
@@ -103,7 +100,6 @@ GPU = {
           GPU.scanline++
           if (GPU.scanline > 153) {
             GPU.scanline = 0
-            GPU.curscan = 0
             GPU.gpumode = 2
           }
         }
@@ -127,91 +123,76 @@ GPU = {
             break
           }
           if ((GPU.control & 0x01)) { // check bgon
-            var linebase = GPU.curscan
+            var linebase = GPU.scanline * 160 * 4
             var mapOffset = ((GPU.control & 0x08) ? 0x1C00 : 0x1800) + ((((GPU.scanline + GPU.scrollY) & 255) >> 3) << 5)
             var y = (GPU.scanline + GPU.scrollY) & 7
             var x = GPU.scrollX & 7
-            var t = (GPU.scrollX >> 3) & 31
-            var w = 160
-            if ((GPU.control & 0x10) ? 0x0000 : 0x0800) { // check bgtilebase
-              var tile = GPU.vram[mapOffset + t]
-              if (tile < 128) {
-                tile = 256 + tile
+            var lineOffset = (GPU.scrollX >> 3) & 31
+            var bgtilebase = (GPU.control & 0x10) ? 0x0000 : 0x0800
+            var tile = GPU.vram[mapOffset + lineOffset]
+            if (bgtilebase && tile < 128) {
+              tile += 256
+            }
+            var tilerow = GPU.tilemap[tile][y]
+            for (var i=0; i<160; i++) {
+              GPU.scanrow[160 - x] = tilerow[x]
+              GPU.screen.data[linebase + 3] = GPU.palette.bg[tilerow[x]]
+              x++
+              if (x == 8) {
+                lineOffset = (lineOffset + 1) & 31
+                x = 0
+                tile = GPU.vram[mapOffset + lineOffset]
+                if (bgtilebase && tile < 128) {
+                  tile = 256 + tile
+                }
+                tilerow = GPU.tilemap[tile][y]
               }
-              var tilerow = GPU.tilemap[tile][y]
-              do {
-                GPU.scanrow[160 - x] = tilerow[x]
-                GPU.screen.data[linebase+3] = GPU.palette.bg[tilerow[x]]
-                x++
-                if (x == 8) {
-                  t = (t + 1) & 31
-                  x = 0
-                  tile = GPU.vram[mapOffset + t]
-                  if (tile < 128) {
-                    tile = 256 + tile
-                  }
-                  tilerow = GPU.tilemap[tile][y]
-                }
-                linebase += 4
-              } while(--w)
-            } else {
-              var tilerow = GPU.tilemap[GPU.vram[mapOffset + t]][y]
-              do {
-                GPU.scanrow[160 - x] = tilerow[x]
-                GPU.screen.data[linebase+3] = GPU.palette.bg[tilerow[x]]
-                x++
-                if (x == 8) {
-                  t = (t + 1) & 31
-                  x = 0
-                  tilerow = GPU.tilemap[GPU.vram[mapOffset+t]][y]
-                }
-                linebase += 4
-              } while(--w)
+              linebase += 4
             }
           }
           if ((GPU.control & 0x02)) { // check objon
             var cnt = 0
             if (!(GPU.control & 0x04)) { // check objsize
               var tilerow
-              var obj
+              var sprite
               var pal
               var x
-              var linebase = GPU.curscan
+              var linebase = GPU.scanline * 160 * 4
               for (var i=0; i<40; i++) {
-                obj = GPU.sprite[i]
-                if (obj.y <= GPU.scanline && (obj.y + 8) > GPU.scanline) {
-                  if (obj.yflip) {
-                    tilerow = GPU.tilemap[obj.tile][7 - (GPU.scanline - obj.y)]
+                sprite = GPU.spritemap[i]
+                if (sprite.y <= GPU.scanline && (sprite.y + 8) > GPU.scanline) {
+                  if (sprite.yflip) {
+                    tilerow = GPU.tilemap[sprite.tile][7 - (GPU.scanline - sprite.y)]
                   } else {
-                    tilerow = GPU.tilemap[obj.tile][GPU.scanline - obj.y]
+                    tilerow = GPU.tilemap[sprite.tile][GPU.scanline - sprite.y]
                   }
-                  if (obj.palette) {
+                  if (sprite.palette) {
                     pal = GPU.palette.obj1
                   } else {
                     pal = GPU.palette.obj0
                   }
-                  linebase = (GPU.scanline * 160 + obj.x) * 4
-                  if (obj.xflip) {
-                    for (x=0; x<8; x++) {
-                      if (obj.x+x >=0 && obj.x+x < 160) {
-                        if (tilerow[7 - x] && (obj.prio || !GPU.scanrow[x])) {
+                  linebase = (GPU.scanline * 160 + sprite.x) * 4
+                  if (sprite.xflip) {
+                    for (var x=0; x<8; x++) {
+                      if (sprite.x + x >=0 && sprite.x + x < 160) {
+                        if (tilerow[7 - x] && (sprite.prio || !GPU.scanrow[x])) {
                           GPU.screen.data[linebase + 3] = pal[tilerow[7 - x]]
                         }
                       }
-                      linebase+=4
+                      linebase += 4
                     }
                   } else {
-                    for (x=0; x<8; x++) {
-                      if (obj.x+x >=0 && obj.x+x < 160) {
-                        if (tilerow[x] && (obj.prio || !GPU.scanrow[x])) {
-                          GPU.screen.data[linebase+3] = pal[tilerow[x]]
+                    for (var x=0; x<8; x++) {
+                      if (sprite.x + x >=0 && sprite.x + x < 160) {
+                        if (tilerow[x] && (sprite.prio || !GPU.scanrow[x])) {
+                          GPU.screen.data[linebase + 3] = pal[tilerow[x]]
                         }
                       }
-                      linebase+=4
+                      linebase += 4
                     }
                   }
                   cnt++
-                  if (cnt>10) {
+                  if (cnt > 10) {
                     break
                   }
                 }
@@ -248,26 +229,26 @@ GPU = {
     if (obj < 40) {
       switch (addr & 3) {
         case 0: {
-          GPU.sprite[obj].y = val - 16
+          GPU.spritemap[obj].y = val - 16
           break
         }
         case 1: {
-          GPU.sprite[obj].x = val - 8
+          GPU.spritemap[obj].x = val - 8
           break
         }
         case 2: {
           if (GPU.control & 0x04) { // check sprite size
-            GPU.sprite[obj].tile = (val & 0xFE)
+            GPU.spritemap[obj].tile = (val & 0xFE)
           } else {
-            GPU.sprite[obj].tile = val
+            GPU.spritemap[obj].tile = val
           }
           break
         }
         case 3: {
-          GPU.sprite[obj].palette = (val & 0x10) ? 1 : 0
-          GPU.sprite[obj].xflip = (val & 0x20) ? 1 : 0
-          GPU.sprite[obj].yflip = (val & 0x40) ? 1 : 0
-          GPU.sprite[obj].prio = (val & 0x80) ? 1 : 0
+          GPU.spritemap[obj].palette = (val & 0x10) ? 1 : 0
+          GPU.spritemap[obj].xflip = (val & 0x20) ? 1 : 0
+          GPU.spritemap[obj].yflip = (val & 0x40) ? 1 : 0
+          GPU.spritemap[obj].prio = (val & 0x80) ? 1 : 0
         }
       }
     }
