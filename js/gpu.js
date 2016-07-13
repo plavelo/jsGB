@@ -4,7 +4,6 @@ GPU = {
   reg: [],
   tilemap: [],
   objdata: [],
-  objdatasorted: [],
   palette: {'bg':[], 'obj0':[], 'obj1':[]},
   scanrow: [],
 
@@ -179,7 +178,7 @@ GPU = {
               var x
               var linebase = GPU.curscan
               for (var i=0; i<40; i++) {
-                obj = GPU.objdatasorted[i]
+                obj = GPU.objdata[i]
                 if (obj.y <= GPU.scanline && (obj.y + 8) > GPU.scanline) {
                   if (obj.yflip) {
                     tilerow = GPU.tilemap[obj.tile][7 - (GPU.scanline - obj.y)]
@@ -272,15 +271,6 @@ GPU = {
         }
       }
     }
-    GPU.objdatasorted = GPU.objdata
-    GPU.objdatasorted.sort(function(a, b) {
-      if (a.x > b.x) {
-        return -1
-      }
-      if (a.num > b.num) {
-        return -1
-      }
-    })
   },
   rb: function(addr) {
     var gaddr = addr - 0xFF40
