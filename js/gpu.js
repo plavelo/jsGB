@@ -3,7 +3,7 @@ GPU = {
   oam: [],
   reg: [],
   tilemap: [],
-  objdata: [],
+  sprite: [],
   palette: {'bg':[], 'obj0':[], 'obj1':[]},
   scanrow: [],
 
@@ -73,7 +73,7 @@ GPU = {
     }
 
     for (i=0; i<40; i++) {
-      GPU.objdata[i] = {'y': -16, 'x': -8, 'tile': 0, 'palette': 0, 'yflip': 0, 'xflip': 0, 'prio': 0, 'num': i}
+      GPU.sprite[i] = {'y': -16, 'x': -8, 'tile': 0, 'palette': 0, 'yflip': 0, 'xflip': 0, 'prio': 0, 'num': i}
     }
   },
   checkline: function() {
@@ -178,7 +178,7 @@ GPU = {
               var x
               var linebase = GPU.curscan
               for (var i=0; i<40; i++) {
-                obj = GPU.objdata[i]
+                obj = GPU.sprite[i]
                 if (obj.y <= GPU.scanline && (obj.y + 8) > GPU.scanline) {
                   if (obj.yflip) {
                     tilerow = GPU.tilemap[obj.tile][7 - (GPU.scanline - obj.y)]
@@ -245,29 +245,29 @@ GPU = {
   updateoam: function(addr, val) {
     addr -= 0xFE00
     var obj = addr >> 2
-    if (obj<40) {
+    if (obj < 40) {
       switch (addr & 3) {
         case 0: {
-          GPU.objdata[obj].y = val - 16
+          GPU.sprite[obj].y = val - 16
           break
         }
         case 1: {
-          GPU.objdata[obj].x = val - 8
+          GPU.sprite[obj].x = val - 8
           break
         }
         case 2: {
-          if (GPU.control & 0x04) { // check objsize
-            GPU.objdata[obj].tile = (val & 0xFE)
+          if (GPU.control & 0x04) { // check sprite size
+            GPU.sprite[obj].tile = (val & 0xFE)
           } else {
-            GPU.objdata[obj].tile = val
+            GPU.sprite[obj].tile = val
           }
           break
         }
         case 3: {
-          GPU.objdata[obj].palette = (val & 0x10) ? 1 : 0
-          GPU.objdata[obj].xflip = (val & 0x20) ? 1 : 0
-          GPU.objdata[obj].yflip = (val & 0x40) ? 1 : 0
-          GPU.objdata[obj].prio = (val & 0x80) ? 1 : 0
+          GPU.sprite[obj].palette = (val & 0x10) ? 1 : 0
+          GPU.sprite[obj].xflip = (val & 0x20) ? 1 : 0
+          GPU.sprite[obj].yflip = (val & 0x40) ? 1 : 0
+          GPU.sprite[obj].prio = (val & 0x80) ? 1 : 0
         }
       }
     }
