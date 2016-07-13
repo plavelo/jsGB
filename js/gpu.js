@@ -23,7 +23,6 @@ GPU = {
   lcdon: 0,
   bgon: 0,
   objon: 0,
-  winon: 0,
 
   objsize: 0,
 
@@ -83,7 +82,6 @@ GPU = {
     GPU.lcdon = 0
     GPU.bgon = 0
     GPU.objon = 0
-    GPU.winon = 0
 
     GPU.objsize = 0
     for (i=0; i<160; i++) {
