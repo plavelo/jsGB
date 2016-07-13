@@ -20,13 +20,6 @@ GPU = {
 
   control: 0,
 
-  bgon: 0,
-  objon: 0,
-
-  objsize: 0,
-
-  bgtilebase: 0x0000,
-  wintilebase: 0x1800,
   reset: function() {
     for (var i=0; i<8192; i++) {
       GPU.vram[i] = 0
@@ -78,10 +71,6 @@ GPU = {
     GPU.raster = 0
     GPU.ints = 0
 
-    GPU.bgon = 0
-    GPU.objon = 0
-
-    GPU.objsize = 0
     for (i=0; i<160; i++) {
       GPU.scanrow[i] = 0
     }
@@ -89,10 +78,6 @@ GPU = {
     for (i=0; i<40; i++) {
       GPU.objdata[i] = {'y': -16, 'x': -8, 'tile': 0, 'palette': 0, 'yflip': 0, 'xflip': 0, 'prio': 0, 'num': i}
     }
-
-    // Set to values expected by BIOS, to start
-    GPU.bgtilebase = 0x0000
-    GPU.wintilebase = 0x1800
   },
   checkline: function() {
     GPU.ticks += Z80.r.m
@@ -144,14 +129,14 @@ GPU = {
           if (!(GPU.control & 0x80)) { // check lcdon
             break
           }
-          if (GPU.bgon) {
+          if ((GPU.control & 0x01)) { // check bgon
             var linebase = GPU.curscan
             var mapOffset = ((GPU.control & 0x08) ? 0x1C00 : 0x1800) + ((((GPU.scanline + GPU.scrollY) & 255) >> 3) << 5)
             var y = (GPU.scanline + GPU.scrollY) & 7
             var x = GPU.scrollX & 7
             var t = (GPU.scrollX >> 3) & 31
             var w = 160
-            if (GPU.bgtilebase) {
+            if ((GPU.control & 0x10) ? 0x0000 : 0x0800) { // check bgtilebase
               var tile = GPU.vram[mapOffset + t]
               if (tile < 128) {
                 tile = 256 + tile
@@ -187,9 +172,9 @@ GPU = {
               } while(--w)
             }
           }
-          if (GPU.objon) {
+          if ((GPU.control & 0x02)) { // check objon
             var cnt = 0
-            if (!GPU.objsize) {
+            if (!(GPU.control & 0x04)) { // check objsize
               var tilerow
               var obj
               var pal
@@ -274,7 +259,7 @@ GPU = {
           break
         }
         case 2: {
-          if (GPU.objsize) {
+          if (GPU.control & 0x04) { // check objsize
             GPU.objdata[obj].tile = (val & 0xFE)
           } else {
             GPU.objdata[obj].tile = val
@@ -324,11 +309,6 @@ GPU = {
     switch (gaddr) {
       case 0:
         GPU.control = val
-
-        GPU.bgtilebase = (val & 0x10) ? 0x0000 : 0x0800
-        GPU.objsize = (val & 0x04) ? 1 : 0
-        GPU.objon = (val & 0x02) ? 1 : 0
-        GPU.bgon = (val & 0x01) ? 1 : 0
         break
       case 2:
         GPU.scrollY = val
