@@ -58,16 +58,16 @@ GPU = {
         throw new Error('GPU: Canvas context could not be created.')
       } else {
         if (GPU.canvas.createImageData) {
-          GPU.scrn = GPU.canvas.createImageData(160,144)
+          GPU.screen = GPU.canvas.createImageData(160,144)
         } else if (GPU.canvas.getImageData) {
-          GPU.scrn = GPU.canvas.getImageData(0,0,160,144)
+          GPU.screen = GPU.canvas.getImageData(0,0,160,144)
         } else {
-          GPU.scrn = {'width': 160, 'height': 144, 'data': new Array(160 * 144 * 4)}
+          GPU.screen = {'width': 160, 'height': 144, 'data': new Array(160 * 144 * 4)}
         }
-        for (i=0; i<GPU.scrn.data.length; i++) {
-          GPU.scrn.data[i] = 255
+        for (i=0; i<GPU.screen.data.length; i++) {
+          GPU.screen.data[i] = 255
         }
-        GPU.canvas.putImageData(GPU.scrn, 0, 0)
+        GPU.canvas.putImageData(GPU.screen, 0, 0)
       }
     }
 
@@ -107,7 +107,7 @@ GPU = {
           // End of hblank for last scanline; render screen
           if (GPU.scanline == 143) {
             GPU.gpumode = 1
-            GPU.canvas.putImageData(GPU.scrn, 0, 0)
+            GPU.canvas.putImageData(GPU.screen, 0, 0)
             MMU.if |= 1
           } else {
             GPU.gpumode = 2
@@ -163,7 +163,7 @@ GPU = {
               var tilerow = GPU.tilemap[tile][y]
               do {
                 GPU.scanrow[160 - x] = tilerow[x]
-                GPU.scrn.data[linebase+3] = GPU.palette.bg[tilerow[x]]
+                GPU.screen.data[linebase+3] = GPU.palette.bg[tilerow[x]]
                 x++
                 if (x == 8) {
                   t = (t + 1) & 31
@@ -180,7 +180,7 @@ GPU = {
               var tilerow = GPU.tilemap[GPU.vram[mapOffset + t]][y]
               do {
                 GPU.scanrow[160-x] = tilerow[x]
-                GPU.scrn.data[linebase+3] = GPU.palette.bg[tilerow[x]]
+                GPU.screen.data[linebase+3] = GPU.palette.bg[tilerow[x]]
                 x++
                 if (x == 8) {
                   t = (t + 1) & 31
@@ -217,7 +217,7 @@ GPU = {
                     for (x=0; x<8; x++) {
                       if (obj.x+x >=0 && obj.x+x < 160) {
                         if (tilerow[7 - x] && (obj.prio || !GPU.scanrow[x])) {
-                          GPU.scrn.data[linebase + 3] = pal[tilerow[7 - x]]
+                          GPU.screen.data[linebase + 3] = pal[tilerow[7 - x]]
                         }
                       }
                       linebase+=4
@@ -226,7 +226,7 @@ GPU = {
                     for (x=0; x<8; x++) {
                       if (obj.x+x >=0 && obj.x+x < 160) {
                         if (tilerow[x] && (obj.prio || !GPU.scanrow[x])) {
-                          GPU.scrn.data[linebase+3] = pal[tilerow[x]]
+                          GPU.screen.data[linebase+3] = pal[tilerow[x]]
                         }
                       }
                       linebase+=4
