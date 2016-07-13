@@ -22,19 +22,19 @@ GPU = {
     for (var i=0; i<8192; i++) {
       GPU.vram[i] = 0
     }
-    for (i=0; i<160; i++) {
+    for (var i=0; i<160; i++) {
       GPU.oam[i] = 0
     }
-    for (i=0; i<4; i++) {
+    for (var i=0; i<4; i++) {
       GPU.palette.bg[i] = 255
       GPU.palette.obj0[i] = 255
       GPU.palette.obj1[i] = 255
     }
-    for (i=0; i<512; i++) {
+    for (var i=0; i<512; i++) {
       GPU.tilemap[i] = []
-      for (j=0; j<8; j++) {
+      for (var j=0; j<8; j++) {
         GPU.tilemap[i][j] = []
-        for (k=0; k<8; k++) {
+        for (var k=0; k<8; k++) {
           GPU.tilemap[i][j][k] = 0
         }
       }
@@ -53,7 +53,7 @@ GPU = {
         } else {
           GPU.screen = {'width': 160, 'height': 144, 'data': new Array(160 * 144 * 4)}
         }
-        for (i=0; i<GPU.screen.data.length; i++) {
+        for (var i=0; i<GPU.screen.data.length; i++) {
           GPU.screen.data[i] = 255
         }
         GPU.canvas.putImageData(GPU.screen, 0, 0)
@@ -68,11 +68,11 @@ GPU = {
     GPU.scrollX = 0
     GPU.raster = 0
 
-    for (i=0; i<160; i++) {
+    for (var i=0; i<160; i++) {
       GPU.scanrow[i] = 0
     }
 
-    for (i=0; i<40; i++) {
+    for (var i=0; i<40; i++) {
       GPU.sprite[i] = {'y': -16, 'x': -8, 'tile': 0, 'palette': 0, 'yflip': 0, 'xflip': 0, 'prio': 0, 'num': i}
     }
   },
@@ -291,26 +291,26 @@ GPU = {
         return GPU.reg[gaddr]
     }
   },
-  wb: function(addr, val) {
-    var gaddr = addr - 0xFF40
-    GPU.reg[gaddr] = val
+  wb: function(address, value) {
+    var gaddr = address - 0xFF40
+    GPU.reg[gaddr] = value
     switch (gaddr) {
       case 0:
-        GPU.control = val
+        GPU.control = value
         break
       case 2:
-        GPU.scrollY = val
+        GPU.scrollY = value
         break
       case 3:
-        GPU.scrollX = val
+        GPU.scrollX = value
         break
       case 5:
-        GPU.raster = val
+        GPU.raster = value
       // OAM DMA
       case 6:
         var v
         for (var i=0; i<160; i++) {
-          v = MMU.rb((val << 8) + i)
+          v = MMU.rb((value << 8) + i)
           GPU.oam[i] = v
           GPU.updateoam(0xFE00 + i, v)
         }
@@ -318,7 +318,7 @@ GPU = {
       // BG palette mapping
       case 7:
         for (var i=0; i<4; i++) {
-          switch((val >> (i * 2)) & 3) {
+          switch((value >> (i * 2)) & 3) {
             case 0:
               GPU.palette.bg[i] = 255
               break
@@ -337,7 +337,7 @@ GPU = {
       // OBJ0 palette mapping
       case 8:
         for (var i=0; i<4; i++) {
-          switch ((val >> (i * 2)) & 3) {
+          switch ((value >> (i * 2)) & 3) {
             case 0:
               GPU.palette.obj0[i] = 255
               break
@@ -356,7 +356,7 @@ GPU = {
       // OBJ1 palette mapping
       case 9:
         for (var i=0; i<4; i++) {
-          switch ((val >> (i * 2)) & 3) {
+          switch ((value >> (i * 2)) & 3) {
             case 0:
               GPU.palette.obj1[i] = 255
               break
