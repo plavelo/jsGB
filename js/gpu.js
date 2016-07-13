@@ -20,7 +20,6 @@ GPU = {
 
   control: 0,
 
-  lcdon: 0,
   bgon: 0,
   objon: 0,
 
@@ -79,7 +78,6 @@ GPU = {
     GPU.raster = 0
     GPU.ints = 0
 
-    GPU.lcdon = 0
     GPU.bgon = 0
     GPU.objon = 0
 
@@ -143,7 +141,7 @@ GPU = {
         if (GPU.ticks >= 43) {
           GPU.ticks = 0
           GPU.gpumode = 0
-          if (!GPU.lcdon) {
+          if (!(GPU.control & 0x80)) { // check lcdon
             break
           }
           if (GPU.bgon) {
@@ -327,7 +325,6 @@ GPU = {
       case 0:
         GPU.control = val
 
-        GPU.lcdon = (val & 0x80) ? 1 : 0
         GPU.bgtilebase = (val & 0x10) ? 0x0000 : 0x0800
         GPU.objsize = (val & 0x04) ? 1 : 0
         GPU.objon = (val & 0x02) ? 1 : 0
