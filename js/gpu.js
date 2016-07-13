@@ -11,12 +11,14 @@ GPU = {
   curline: 0,
   curscan: 0,
   linemode: 0,
-  modeclocks: 0,
+  ticks: 0,
 
   yscrl: 0,
   xscrl: 0,
   raster: 0,
   ints: 0,
+
+  control: 0,
 
   lcdon: 0,
   bgon: 0,
@@ -73,9 +75,9 @@ GPU = {
     GPU.curline = 0
     GPU.curscan = 0
     GPU.linemode = 2
-    GPU.modeclocks = 0
-    GPU.yscrl = 0
-    GPU.xscrl = 0
+    GPU.ticks = 0
+    GPU.scrollY = 0
+    GPU.scrollX = 0
     GPU.raster = 0
     GPU.ints = 0
 
@@ -99,11 +101,11 @@ GPU = {
     GPU.wintilebase = 0x1800
   },
   checkline: function() {
-    GPU.modeclocks += Z80.r.m
+    GPU.ticks += Z80.r.m
     switch (GPU.linemode) {
       // In hblank
       case 0: {
-        if (GPU.modeclocks >= 51) {
+        if (GPU.ticks >= 51) {
           // End of hblank for last scanline; render screen
           if (GPU.curline == 143) {
             GPU.linemode = 1
@@ -114,14 +116,14 @@ GPU = {
           }
           GPU.curline++
           GPU.curscan += 640
-          GPU.modeclocks = 0
+          GPU.ticks = 0
         }
         break
       }
       // In vblank
       case 1: {
-        if (GPU.modeclocks >= 114) {
-          GPU.modeclocks = 0
+        if (GPU.ticks >= 114) {
+          GPU.ticks = 0
           GPU.curline++
           if (GPU.curline > 153) {
             GPU.curline = 0
@@ -133,8 +135,8 @@ GPU = {
       }
       // In OAM-read mode
       case 2: {
-        if (GPU.modeclocks >= 20) {
-          GPU.modeclocks = 0
+        if (GPU.ticks >= 20) {
+          GPU.ticks = 0
           GPU.linemode = 3
         }
         break
@@ -142,16 +144,16 @@ GPU = {
       // In VRAM-read mode
       case 3: {
         // Render scanline at end of allotted time
-        if (GPU.modeclocks >= 43) {
-          GPU.modeclocks = 0
+        if (GPU.ticks >= 43) {
+          GPU.ticks = 0
           GPU.linemode = 0
           if (GPU.lcdon) {
             if (GPU.bgon) {
               var linebase = GPU.curscan
-              var mapbase = GPU.bgmapbase + ((((GPU.curline + GPU.yscrl) & 255) >> 3) << 5)
-              var y = (GPU.curline + GPU.yscrl) & 7
-              var x = GPU.xscrl & 7
-              var t = (GPU.xscrl >> 3) & 31
+              var mapbase = GPU.bgmapbase + ((((GPU.curline + GPU.scrollY) & 255) >> 3) << 5)
+              var y = (GPU.curline + GPU.scrollY) & 7
+              var x = GPU.scrollX & 7
+              var t = (GPU.scrollX >> 3) & 31
               var w = 160
               if (GPU.bgtilebase) {
                 var tile = GPU.vram[mapbase + t]
@@ -310,9 +312,9 @@ GPU = {
       case 1:
         return (GPU.curline == GPU.raster ? 4 : 0) | GPU.linemode
       case 2:
-        return GPU.yscrl
+        return GPU.scrollY
       case 3:
-        return GPU.xscrl
+        return GPU.scrollX
       case 4:
         return GPU.curline
       case 5:
@@ -326,6 +328,8 @@ GPU = {
     GPU.reg[gaddr] = val
     switch (gaddr) {
       case 0:
+        GPU.control = val
+
         GPU.lcdon = (val & 0x80) ? 1 : 0
         GPU.bgtilebase = (val & 0x10) ? 0x0000 : 0x0800
         GPU.bgmapbase = (val & 0x08) ? 0x1C00 : 0x1800
@@ -334,10 +338,10 @@ GPU = {
         GPU.bgon = (val & 0x01) ? 1 : 0
         break
       case 2:
-        GPU.yscrl = val
+        GPU.scrollY = val
         break
       case 3:
-        GPU.xscrl = val
+        GPU.scrollX = val
         break
       case 5:
         GPU.raster = val

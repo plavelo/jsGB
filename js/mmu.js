@@ -46,10 +46,10 @@ MMU = {
     MMU.ie = 0
     MMU.if = 0
 
-    MMU.carttype=0
+    MMU.carttype = 0
     MMU.mbc[1] = {rombank:0, rambank:0, ramon:0, mode:0}
-    MMU.romoffs=0x4000
-    MMU.ramoffs=0
+    MMU.romoffs = 0x4000
+    MMU.ramoffs = 0
   },
   load: function(file) {
     MMU.carttype = MMU.rom[0x0147]
@@ -135,46 +135,39 @@ MMU = {
       // ROM bank 0
       // MBC1: Turn external RAM on
       case 0x0000: case 0x1000:
-        switch(MMU.carttype) {
-          case 1:
-            MMU.mbc[1].ramon = ((val & 0xF) == 0xA) ? 1 : 0
-            break
+        if (MMU.carttype === 1) {
+          MMU.mbc[1].ramon = ((val & 0xF) == 0xA) ? 1 : 0
         }
       break
       // MBC1: ROM bank switch
       case 0x2000: case 0x3000:
-        switch(MMU.carttype) {
-          case 1:
-            MMU.mbc[1].rombank &= 0x60
-            val &= 0x1F
-            if (!val) {
-              val = 1
-            }
-            MMU.mbc[1].rombank |= val
-            MMU.romoffs = MMU.mbc[1].rombank * 0x4000
-            break
+        if (MMU.carttype === 1) {
+          MMU.mbc[1].rombank &= 0x60
+          val &= 0x1F
+          if (!val) {
+            val = 1
+          }
+          MMU.mbc[1].rombank |= val
+          MMU.romoffs = MMU.mbc[1].rombank * 0x4000
         }
         break
       // ROM bank 1
       // MBC1: RAM bank switch
       case 0x4000: case 0x5000:
-        switch (MMU.carttype) {
-          case 1:
-            if (MMU.mbc[1].mode) {
-              MMU.mbc[1].rambank = (val&3)
-              MMU.ramoffs = MMU.mbc[1].rambank * 0x2000
-            } else {
-              MMU.mbc[1].rombank &= 0x1F
-              MMU.mbc[1].rombank |= ((val & 3) << 5)
-              MMU.romoffs = MMU.mbc[1].rombank * 0x4000
-            }
+        if (MMU.carttype === 1) {
+          if (MMU.mbc[1].mode) {
+            MMU.mbc[1].rambank = (val&3)
+            MMU.ramoffs = MMU.mbc[1].rambank * 0x2000
+          } else {
+            MMU.mbc[1].rombank &= 0x1F
+            MMU.mbc[1].rombank |= ((val & 3) << 5)
+            MMU.romoffs = MMU.mbc[1].rombank * 0x4000
+          }
         }
         break
       case 0x6000: case 0x7000:
-        switch (MMU.carttype) {
-          case 1:
-            MMU.mbc[1].mode = val & 1
-            break
+        if (MMU.carttype === 1) {
+          MMU.mbc[1].mode = val & 1
         }
         break
       // VRAM
