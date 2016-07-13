@@ -16,7 +16,6 @@ GPU = {
   scrollY: 0,
   scrollX: 0,
   raster: 0,
-  ints: 0,
 
   control: 0,
 
@@ -69,7 +68,6 @@ GPU = {
     GPU.scrollY = 0
     GPU.scrollX = 0
     GPU.raster = 0
-    GPU.ints = 0
 
     for (i=0; i<160; i++) {
       GPU.scanrow[i] = 0
@@ -160,7 +158,7 @@ GPU = {
             } else {
               var tilerow = GPU.tilemap[GPU.vram[mapOffset + t]][y]
               do {
-                GPU.scanrow[160-x] = tilerow[x]
+                GPU.scanrow[160 - x] = tilerow[x]
                 GPU.screen.data[linebase+3] = GPU.palette.bg[tilerow[x]]
                 x++
                 if (x == 8) {
