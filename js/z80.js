@@ -1,10 +1,3 @@
-/**
- * jsGB: Z80 core
- * Imran Nazar, May 2009
- * Notes: This is a GameBoy Z80, not a Z80. There are differences.
- * Bugs: If PC wraps at the top of memory, this will not be caught until the end of an instruction
- */
-
 Z80 = {
   r: {
     a: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, f: 0,
