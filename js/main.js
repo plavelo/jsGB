@@ -1,9 +1,7 @@
 jsGB = {
   run_interval: 0,
-  trace: '',
   frame: function() {
     var fclock = Z80.clock.m + 17556
-    var t0 = new Date()
     do {
       if (Z80.halt) {
         Z80.r.m = 1
@@ -44,7 +42,6 @@ jsGB = {
         break
       }
     } while (Z80.clock.m < fclock)
-    var t1 = new Date()
   },
   reset: function() {
     GPU.reset()

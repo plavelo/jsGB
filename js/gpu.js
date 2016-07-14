@@ -156,7 +156,6 @@ GPU = {
               var tilerow
               var sprite
               var pal
-              var x
               var pixelOffset = GPU.scanline * 160 * 4
               for (var i=0; i<40; i++) {
                 sprite = GPU.spritemap[i]
